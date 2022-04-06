@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script defer src="{% static 'js/bootstrap.js' %}"></script>
+    <script defer src="{% static 'js/validation.js' %}"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+</head>
+
+<body>
+    {% block navbar %}
+    {% endblock navbar %}
+
+    {% block content %}
+    <div class="jumbotron m-5">
+        <h1 class="display-4">Welcome</h1>
+        <p class="lead">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Illo omnis optio facere enim
+            distinctio! Autem optio commodi deleniti nulla saepe excepturi iste distinctio iusto delectus vero
+            exercitationem, accusamus, laboriosam dolore illum inventore porro similique sequi ut voluptas quis ab
+            libero! Aliquam harum odit adipisci? Ad officiis odit debitis dolor dolorem..</p>
+        <hr class="my-4">
+        <p>Register as a Saller here.... If you registered already the try to login.</p>
+        <p class="lead mb-5">
+            <a class="btn btn-primary btn-lg" href="{% url 'saller-register' %}" role="button">Register as a Saller</a>
+            <a class="btn btn-success btn-lg" href="{% url 'saller-login' %}" role="button">Login as a Saller</a>
+        </p><hr>
+        <p class="mt-5">Register as a Customer here.... If you registered already the try to login..</p>
+        <p class="lead">
+            <a class="btn btn-primary btn-lg" href="{% url 'customer-register' %}" role="button">Register as a Customer</a>
+            <a class="btn btn-success btn-lg" href="{% url 'customer-login' %}" role="button">Login as a Customer</a>
+        </p>
+    </div>
+
+
+
+    {% endblock content %}
+</body>
+
+</html>
