@@ -1,12 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends 'index.html' %}
+{% load static %}
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark p-3">
+    <a class="navbar-brand" href="{% url 'customer-homepage' %}">{{request.user}}</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="#">Wish List</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'cart' %}">{{request.user}}'s Cart</a>
+        </li>
+        <li class="nav-item dropdown">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Categoris
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              {% for obj in category %}
+              <li><a class="dropdown-item" href="#">{{obj.category_name}}</a></li>
+              {% endfor %}
+            </ul>
+          </li>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'saller-logout' %}">Log out</a>
+        </li>
+      </ul>
+    </div>
+    <form class="d-flex">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      </form>
+</nav>
+{% endblock navbar %}
+
+
+{% block content %}
+<div class="jumbotron m-5">
+    <h1 class="display-4">{{request.user}}'s Wish List</h1>
+    <p class="lead">Here are products...</p>
+    <p class="lead">{{total_price}}</p>
+    <hr class="my-4 mt-5">  
+</div>
+
+{% for product in product_list %}
+<div class="jumbotron m-5 mt-5">
+  <img src="{{product.products.product_image.url}}" class="image_container" alt="" width="250px" height="250px"> 
+  <h1 class="display-4" id="product_name">{{product.products.product_name}}</h1> 
+  <p class="lead">{{product.products.product_discription}}</p>
+  <hr class="my-4">
+  <p>₹{{product.products.product_price}}</p>
+  <p>{{product.products.product_category}}</p>
+  <p>Quantity : {{product.products.quantity}}</p>
+  <p>{{product.user}}</p>
+  <a class="btn btn-primary btn-lg" href="{% url 'details' product.id %}" role="button">Details</a>  
+  <!-- <a class="btn btn-warning btn-lg" href="{% url 'add-to-cart' product.id %}" role="button">Add to cart</a>
+  <a class="btn btn-info btn-lg" href="{% url 'remove-from-wish-list' product.id %}" role="button">Remove from wish list</a> -->
+  <form action="{% url 'add-to-cart' product.id %}" method="POST" class="d-inline mx-1">
+    {% csrf_token %}
+    <button class="btn btn-warning btn-lg">Add to cart</button>
+  </form>
+  <form action="{% url 'remove-from-wish-list' product.id %}" method="POST" class="d-inline mx-1">
+    {% csrf_token %}
+    <button class="btn btn-info btn-lg">Remove from wish list</button>
+  </form>
+
+</div>
+{% endfor %}
+{% endblock content %}
+
+{% block paginator %}
+      {% if is_paginated %}
+      <div class="m-4">
+        <nav>
+            <ul class="pagination justify-content-center">
+              {% if page_obj.has_previous %}
+                <li class="page-item"><a href="?page={{page_obj.previous_page_number}}" class="page-link">Previous</a></li>
+                {% endif %}
+                  <li class="page-item"><a href="#" class="page-link">{{page_obj.number}}</a></li>
+              {% if page_obj.has_next %}
+                <li class="page-item"><a href="?page={{page_obj.next_page_number}}" class="page-link">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+      </div>
+      {% endif %}
+{% endblock paginator %}
+
+

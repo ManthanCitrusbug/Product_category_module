@@ -30,14 +30,15 @@
             <span id="error_email" class="text-danger"></span><br>
             <label for="">Profile Image :</label><br>
             {{form.profile_image}}<br>
-            <label for="">Be a Customer :</label>
-            {{form.be_a_customer}}<br><br>
             <label for="">Password :</label><br>
             {{form.password}}
             <span id="error_password" class="text-danger"></span><br><br>
+            <input type="hidden" value="True" name="customer">
             <input type="submit" value="Submit" class="btn btn-success">
         </form>
     </section>
     {% endblock content %}
+    {% block paginator %}
+    {% endblock paginator %}
 </body>
 </html>

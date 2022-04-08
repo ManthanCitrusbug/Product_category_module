@@ -2,17 +2,17 @@
 {% load static %}
 {% block navbar %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-3">
-    <a class="navbar-brand" href="{% url 'saller-dashboard' %}">{{request.user}}</a>
+    <a class="navbar-brand" href="{% url 'customer-homepage' %}">{{request.user}}</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
-          <a class="nav-link" href="{% url 'add-product' %}">Add product</a>
+          <a class="nav-link" href="{% url 'wish-list' %}">Wish List</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Link</a>
+          <a class="nav-link" href="{% url 'cart' %}">{{request.user}}'s Cart</a>
         </li>
         <li class="nav-item dropdown">
           <li class="nav-item dropdown">
@@ -38,28 +38,39 @@
 </nav>
 {% endblock navbar %}
 {% block content %}
-<div class="jumbotron m-5">
-    <h1 class="display-4">Welcome {{request.user}}</h1>
-    <p class="lead">Here are your products...</p>
-    <hr class="my-4 mt-5">
-</div>
-
-{% for user in product_list %}
-<div class="jumbotron m-5 mt-5">
-  <img src="{{user.product_image.url}}" class="image_container" alt="" width="250px" height="250px"> 
-  <h1 class="display-4" id="product_name">{{user.product_name}}</h1> 
-  <p class="lead">{{user.product_discription}}</p>
-  <hr class="my-4">
-  <p>₹{{user.product_price}}</p>
-  <p>{{user.product_category}}</p>
-  <p>Quantity : {{user.quantity}}</p>
-  <p>{{user.user}}</p>
-  <a class="btn btn-primary btn-lg" href="{% url 'details' user.id %}" role="button">Details</a>  
-  <a class="btn btn-warning btn-lg" href="{% url 'edit-product' user.id %}" role="button">Edit</a>
-  <a class="btn btn-danger btn-lg" href="{% url 'delete-product' user.id %}" role="button">Delete</a>
-</div>
-{% endfor %}
+<section style="background-color: #eee;">
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="">
+          <div class="card text-black">
+            <i class="fab fa-apple fa-lg pt-3 pb-1 px-3"></i>
+            <img
+              src="{{product.product_image.url}}"
+              class="card-img-center m-auto"
+              alt="product image"
+              width="400px"
+              height="400px"
+            /><br>
+            <div class="card-body">
+              <div class="text-center">
+                <h3 class="card-title">{{product.product_name}}</h3><br>
+                <p class="text-muted mb-4">{{product.product_discription}}</p>
+              </div>
+              <div>
+                <!-- ś -->
+              <div class="d-flex justify-content-between total font-weight-bold mt-4">
+                <span>Total</span><span>₹{{product.product_price}}</span><br>
+                <p>Add By :</p><p class="text-muted mb-4">{{product.user}}</p>
+                <p>Quantity :</p><p class="text-muted mb-4">{{product.quantity}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 {% endblock content %}
+
 {% block paginator %}
 {% endblock paginator %}
 

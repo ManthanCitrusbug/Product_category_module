@@ -11,7 +11,7 @@ from .models import Category, Product, UserModel
 class SallerRegisterForm(forms.ModelForm):
     class Meta:
         model = UserModel
-        fields = ['username', 'first_name', 'last_name', 'email', 'profile_image', 'be_a_customer', 'password']
+        fields = ['username', 'first_name', 'last_name', 'email', 'profile_image', 'password']
         widgets = {
             'username' : forms.TextInput(
                 attrs={'class' : 'form-control w-50 m-auto'}
@@ -28,9 +28,6 @@ class SallerRegisterForm(forms.ModelForm):
             'profile_image' : forms.FileInput(
                 attrs={'class' : 'form-control w-50 m-auto'}
             ),
-            'be_a_customer' : forms.CheckboxInput(
-                attrs={'class' : 'form-check-input m-auto'}
-            ),
             'password' : forms.PasswordInput(
                 attrs={'class' : 'form-control w-50 m-auto'}
             )
@@ -40,6 +37,7 @@ class SallerRegisterForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password'])
+        user.is_seller = True
         if commit:
             user.save()
         return user
@@ -120,7 +118,7 @@ class CutomerLoginForm(forms.ModelForm):
 class AddProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['product_name', 'product_discription', 'product_image', 'product_category', 'product_price']
+        fields = ['product_name', 'product_discription', 'product_image', 'product_category', 'product_price', 'quantity']
         widgets = {
             'product_name' : forms.TextInput(
                 attrs={'class' : 'form-control w-50 m-auto'}
@@ -135,6 +133,9 @@ class AddProductForm(forms.ModelForm):
                 attrs={'class' : 'form-control w-50 m-auto'}
             ),
             'product_price' : forms.TextInput(
+                attrs={'class' : 'form-control w-50 m-auto'}
+            ),
+            'quantity' : forms.TextInput(
                 attrs={'class' : 'form-control w-50 m-auto'}
             ),
  

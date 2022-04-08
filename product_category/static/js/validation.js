@@ -153,10 +153,10 @@ function login_validate(){
     }
 
     if(submition===1){
-        // document.getElementById("submit").innerHTML = "Submited";
         return true;
     }
     else{
+        // document.getElementById('error_password').innerHTML = "Invalid Credentials."
         return false;
     }
 }
@@ -167,6 +167,8 @@ function product_validate(){
     const product_img = document.getElementById("id_product_image").value;
     const product_price = document.getElementById("id_product_price").value;
     const product_category = document.getElementById("id_product_category").value;
+    const quantity = document.getElementById("id_quantity").value;
+
     var submition = 1;
 
     if(product_name == ""){
@@ -202,12 +204,11 @@ function product_validate(){
         submition = 1;
     }
 
-
     if(product_price == ""){
         document.getElementById("error_product_price").innerHTML = "Enter Product Price.";
         submition = 0;
     }
-    else if(isNaN(product_price)){
+    else if(isNaN(product_price) || product_price < 1){
         document.getElementById("error_product_price").innerHTML = "Enter a valid product price."
         submition = 0;
     }
@@ -216,13 +217,25 @@ function product_validate(){
         submition = 1;
     }
 
-
     if(product_category == ""){
         document.getElementById("error_product_category").innerHTML = "Select Product Category.";
         submition = 0;
     }
     else{
         document.getElementById("error_product_category").innerHTML = "";
+        submition = 1;
+    }
+
+    if(quantity == ""){
+        document.getElementById("error_quantity").innerHTML = "Enter Product Quantity.";
+        submition = 0;
+    }
+    else if(isNaN(quantity)){
+        document.getElementById("error_quantity").innerHTML = "Enter a valid product quantity."
+        submition = 0;
+    }
+    else{
+        document.getElementById("error_quantity").innerHTML = "";
         submition = 1;
     }
 

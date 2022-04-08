@@ -65,8 +65,13 @@
             <label for="">Product Category :</label><br>
             {{form.product_category}}
             <span id="error_product_category" class="text-danger"></span><br><br>
+            <label for="">Product Quantity :</label><br>
+            {{form.quantity}}
+            <span id="error_quantity" class="text-danger"></span><br><br>
             <input type="submit" value="Submit" class="btn btn-success">
         </form>
     {% endblock content %}
+    {% block paginator %}
+    {% endblock paginator %}
 </body>
 </html>

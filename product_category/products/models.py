@@ -1,4 +1,4 @@
-from pickle import TRUE
+import uuid
 from django.db import models
 from django.contrib.auth.models import User, AbstractBaseUser, BaseUserManager, PermissionsMixin
 # Create your models here.
@@ -41,7 +41,7 @@ class UserModel(AbstractBaseUser,PermissionsMixin):
     last_name               = models.CharField(max_length=70)
     email                   = models.EmailField(max_length=70, unique=True)
     profile_image           = models.ImageField(upload_to = 'image/', default = 'media/image/defualt_img.jpeg')
-    be_a_customer           = models.BooleanField(default=False)
+    is_seller           = models.BooleanField(default=False)
 
     is_active               = models.BooleanField(default=True)
     is_admin                = models.BooleanField(default=False)
@@ -65,21 +65,26 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    id                             = models.AutoField(primary_key=True)
     product_name                   = models.CharField(max_length=100)
     product_discription            = models.TextField()
-    product_image                  = models.ImageField(upload_to = 'image/', default = 'media/image/defualt_img.jpg')
+    product_image                  = models.ImageField(upload_to = 'image/', default = 'image/defualt_img.jpg')
     product_price                  = models.PositiveIntegerField()
-    # product_quantity               = models.IntegerField(default=1)
     product_category               = models.ForeignKey(Category, on_delete=models.CASCADE)
     user                           = models.ForeignKey(UserModel,on_delete=models.CASCADE)
+    quantity                       = models.PositiveIntegerField(default=1)
     wish_list                      = models.BooleanField(default=False)
-    # product_name                   = models.CharField(max_length=100)
 
     def __str__(self):
         return self.product_name
 
 
 class WishList(models.Model):
-    products                        = models.ForeignKey(Product, on_delete=models.CASCADE)
-    user                            = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+    user                           = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+    products                       = models.ForeignKey(Product, on_delete=models.CASCADE)
+    
 
+
+class Cart(models.Model):
+    user                           = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+    products                       = models.ForeignKey(Product, on_delete=models.CASCADE)

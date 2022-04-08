@@ -12,7 +12,7 @@
           <a class="nav-link" href="{% url 'wish-list' %}">Wish List</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'cart' %}">{{request.user}}'s Cart</a>
+          <a class="nav-link" href="#">{{request.user}}'s Cart</a>
         </li>
         <li class="nav-item dropdown">
           <li class="nav-item dropdown">
@@ -37,45 +37,50 @@
       </form>
 </nav>
 {% endblock navbar %}
+
+
 {% block content %}
 <div class="jumbotron m-5">
-    <h1 class="display-4">Welcome {{request.user}}</h1>
+    <h1 class="display-4">{{request.user}}'s Cart</h1>
     <p class="lead">Here are products...</p>
-    <form action="" method="GET">
-      <select name="paginate" >
-        <option>5</option>
-        <option>10</option>
-        <option>15</option>
-      </select>
-    </form>
+    <p class="lead">Total amount : ₹{{total_amount}}</p>
     <hr class="my-4 mt-5">  
 </div>
 
-{% for user in product_list %}
+{% for product in product_list %}
 <div class="jumbotron m-5 mt-5">
-  <img src="{{user.product_image.url}}" class="image_container" alt="" width="250px" height="250px"> 
-  <h1 class="display-4" id="product_name">{{user.product_name}}</h1> 
-  <p class="lead">{{user.product_discription}}</p>
+  <img src="{{product.products.product_image.url}}" class="image_container" alt="" width="250px" height="250px"> 
+  <h1 class="display-4" id="product_name">{{product.products.product_name}}</h1> 
+  <p class="lead">{{product.products.product_discription}}</p>
   <hr class="my-4">
-  <p>₹{{user.product_price}}</p>
-  <p>{{user.product_category}}</p>
-  <p>Quantity : {{user.quantity}}</p>
-  <p>{{user.user}}</p>
-  <a class="btn btn-primary btn-lg" href="{% url 'details' user.id %}" role="button">Details</a>  
-  <form action="{% url 'add-to-cart' user.id %}" method="POST" class="d-inline mx-1">
+  <p>₹{{product.products.product_price}}</p>
+  <p>{{product.products.product_category}}</p>
+  <p>Quantity :
+    <a href="" class="text-dark" id="plus">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
+      <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
+    </svg></a>
+     {{product.products.quantity}}
+     <a href="" class="text-dark">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+      <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+    </svg></a>
+
+  </p>
+  <p>{{product.user}}</p>
+  <a class="btn btn-primary btn-lg" href="{% url 'details' product.id %}" role="button">Details</a>  
+  <a class="btn btn-warning btn-lg" href="#" role="button">Buy now</a>
+  <form action="{% url 'remove-from-cart' product.id %}" method="POST" class="d-inline mx-1">
     {% csrf_token %}
-    <button class="btn btn-warning btn-lg">Add to cart</button>
+    <button class="btn btn-info btn-lg">Remove from cart</button>
   </form>
-  <form action="{% url 'add-to-wish-list' user.id %}" method="POST" class="d-inline mx-1">
-    {% csrf_token %}
-    <button class="btn btn-info btn-lg">Add to wish list</button>
-  </form>
+
 </div>
 {% endfor %}
 {% endblock content %}
 
 {% block paginator %}
-      {% if is_paginated %}
+    {% if is_paginated %}
       <div class="m-4">
         <nav>
             <ul class="pagination justify-content-center">
@@ -89,7 +94,7 @@
             </ul>
         </nav>
       </div>
-      {% endif %}
+    {% endif %}
 {% endblock paginator %}
 
 
