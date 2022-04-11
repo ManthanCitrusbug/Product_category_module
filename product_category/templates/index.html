@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script defer src="{% static 'js/bootstrap.js' %}"></script>
     <script defer src="{% static 'js/validation.js' %}"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script defer src="{% static 'js/jquery.js' %}"></script>
+    <script defer src="{% static 'js/ajax.js' %}"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Index</title>
 </head>
@@ -28,8 +29,8 @@
         <hr class="my-4">
         <p>Register as a Saller here.... If you registered already the try to login.</p>
         <p class="lead mb-5">
-            <a class="btn btn-primary btn-lg" href="{% url 'saller-register' %}" role="button">Register as a Saller</a>
-            <a class="btn btn-success btn-lg" href="{% url 'saller-login' %}" role="button">Login as a Saller</a>
+            <a class="btn btn-primary btn-lg" href="{% url 'saller-register' %}" role="button">Register as a Seller</a>
+            <a class="btn btn-success btn-lg" href="{% url 'saller-login' %}" role="button">Login as a Seller</a>
         </p><hr>
         <p class="mt-5">Register as a Customer here.... If you registered already the try to login..</p>
         <p class="lead">

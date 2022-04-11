@@ -2,94 +2,94 @@
 {% load static %}
 {% block navbar %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-3">
-    <a class="navbar-brand" href="{% url 'customer-homepage' %}">{{request.user}}</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <a class="nav-link" href="{% url 'wish-list' %}">Wish List</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'cart' %}">{{request.user}}'s Cart</a>
-        </li>
-        <li class="nav-item dropdown">
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Categoris
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              {% for obj in category %}
-              <li><a class="dropdown-item" href="#">{{obj.category_name}}</a></li>
-              {% endfor %}
-            </ul>
-          </li>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'saller-logout' %}">Log out</a>
-        </li>
-      </ul>
-    </div>
-    <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-      </form>
+  <a class="navbar-brand" href="{% url 'customer-homepage' %}">{{request.user}}</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'wish-list' %}">Wish List</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'cart' %}">{{request.user}}'s Cart</a>
+      </li>
+      <li class="nav-item dropdown">
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+          aria-expanded="false">
+          Categoris
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+          {% for obj in category %}
+          <li><a class="dropdown-item" href="#">{{obj.category_name}}</a></li>
+          {% endfor %}
+        </ul>
+      </li>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'saller-logout' %}">Log out</a>
+      </li>
+    </ul>
+  </div>
+  <form class="d-flex" method="GET">
+    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="searchinput">
+    <button class="btn btn-outline-success my-2 my-sm-0" type="submit" id="searchbtn">Search</button>
+  </form>
 </nav>
 {% endblock navbar %}
 {% block content %}
 <div class="jumbotron m-5">
-    <h1 class="display-4">Welcome {{request.user}}</h1>
-    <p class="lead">Here are products...</p>
-    <form action="" method="GET">
-      <select name="paginate" >
-        <option>5</option>
-        <option>10</option>
-        <option>15</option>
-      </select>
-    </form>
-    <hr class="my-4 mt-5">  
-</div>
-
-{% for user in product_list %}
-<div class="jumbotron m-5 mt-5">
-  <img src="{{user.product_image.url}}" class="image_container" alt="" width="250px" height="250px"> 
-  <h1 class="display-4" id="product_name">{{user.product_name}}</h1> 
-  <p class="lead">{{user.product_discription}}</p>
-  <hr class="my-4">
-  <p>₹{{user.product_price}}</p>
-  <p>{{user.product_category}}</p>
-  <p>Quantity : {{user.quantity}}</p>
-  <p>{{user.user}}</p>
-  <a class="btn btn-primary btn-lg" href="{% url 'details' user.id %}" role="button">Details</a>  
-  <form action="{% url 'add-to-cart' user.id %}" method="POST" class="d-inline mx-1">
-    {% csrf_token %}
-    <button class="btn btn-warning btn-lg">Add to cart</button>
+  <h1 class="display-4">Welcome {{request.user}}</h1>
+  <p class="lead">Here are products...</p>
+  <form action="" method="GET">
+    <select name="paginate">
+      <option>5</option>
+      <option>10</option>
+      <option>15</option>
+    </select>
   </form>
-  <form action="{% url 'add-to-wish-list' user.id %}" method="POST" class="d-inline mx-1">
-    {% csrf_token %}
-    <button class="btn btn-info btn-lg">Add to wish list</button>
-  </form>
+  <hr class="my-4 mt-5">
 </div>
-{% endfor %}
+<div class="main"></div>
+    {% for user in product_list %}
+    <div class="jumbotron m-5 mt-5 hide">
+      <img src="{{user.product_image.url}}" class="image_container" alt="" width="250px" height="250px">
+      <h1 class="display-4" id="product_name">{{user.product_name}}</h1>
+      <p class="lead">{{user.product_discription}}</p>
+      <hr class="my-4">
+      <p>₹{{user.product_price}}</p>
+      <p>{{user.product_category}}</p>
+      <p>Quantity : {{user.quantity}}</p>
+      <p>{{user.user}}</p>
+      <a class="btn btn-primary btn-lg" href="{% url 'details' user.id %}" role="button">Details</a>
+      <form action="{% url 'add-to-cart' user.id %}" method="POST" class="d-inline mx-1">
+        {% csrf_token %}
+        <button class="btn btn-warning btn-lg">Add to cart</button>
+      </form>
+      <form action="{% url 'add-to-wish-list' user.id %}" method="POST" class="d-inline mx-1">
+        {% csrf_token %}
+        <button class="btn btn-info btn-lg">Add to wish list</button>
+      </form>
+    </div>
+    {% endfor %}
 {% endblock content %}
 
 {% block paginator %}
-      {% if is_paginated %}
-      <div class="m-4">
-        <nav>
-            <ul class="pagination justify-content-center">
-              {% if page_obj.has_previous %}
-                <li class="page-item"><a href="?page={{page_obj.previous_page_number}}" class="page-link">Previous</a></li>
-                {% endif %}
-                  <li class="page-item"><a href="#" class="page-link">{{page_obj.number}}</a></li>
-              {% if page_obj.has_next %}
-                <li class="page-item"><a href="?page={{page_obj.next_page_number}}" class="page-link">Next</a></li>
-                {% endif %}
-            </ul>
-        </nav>
-      </div>
+{% if is_paginated %}
+<div class="m-4">
+  <nav>
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+      <li class="page-item"><a href="?page={{page_obj.previous_page_number}}" class="page-link">Previous</a></li>
       {% endif %}
+      <li class="page-item"><a href="#" class="page-link">{{page_obj.number}}</a></li>
+      {% if page_obj.has_next %}
+      <li class="page-item"><a href="?page={{page_obj.next_page_number}}" class="page-link">Next</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% endif %}
 {% endblock paginator %}
-
-

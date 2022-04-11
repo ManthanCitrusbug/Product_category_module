@@ -43,7 +43,7 @@
 <div class="jumbotron m-5">
     <h1 class="display-4">{{request.user}}'s Cart</h1>
     <p class="lead">Here are products...</p>
-    <p class="lead">Total amount : ₹{{total_amount}}</p>
+    <p class="lead" id="total">Total amount : ₹{{total_amount}}</p>
     <hr class="my-4 mt-5">  
 </div>
 
@@ -55,17 +55,16 @@
   <hr class="my-4">
   <p>₹{{product.products.product_price}}</p>
   <p>{{product.products.product_category}}</p>
-  <p>Quantity :
-    <a href="" class="text-dark" id="plus">
+  <p class="qn">Quantity :
+    <a href="#" class="text-dark minus" pid="{{product.products.id}}">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
       <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
     </svg></a>
-     {{product.products.quantity}}
-     <a href="" class="text-dark">
+     <span class="qun">{{product.products.quantity}}</span>
+     <a href="" class="text-dark plus" pid="{{product.products.id}}">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
       <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
     </svg></a>
-
   </p>
   <p>{{product.user}}</p>
   <a class="btn btn-primary btn-lg" href="{% url 'details' product.id %}" role="button">Details</a>  

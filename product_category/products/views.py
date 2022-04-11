@@ -1,7 +1,9 @@
+from urllib import request
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from django.db.models import Q
 from django.views import View
-
+from django.http import JsonResponse
 from .models import Category, Product, UserModel, WishList, Cart
 from .forms import (SallerRegisterForm, 
                     SallerLoginForm, 
@@ -44,6 +46,7 @@ class SallerLoginView(View):
                 return redirect('saller-dashboard')
         else:
             return render(request,'saller/saller_login.html',{'form':form})
+
     def get(self,request):
         form = SallerLoginForm()
         return render(request,'saller/saller_login.html',{'form':form})
@@ -78,7 +81,7 @@ class AddProductView(CreateView):
         new_product = form.save(commit=False)
         new_product.user = self.request.user
         new_product.save()
-        return super (AddProductView, self).form_valid(form)
+        return super(AddProductView, self).form_valid(form)
 
 
 class EditProductView(UpdateView):
@@ -87,7 +90,7 @@ class EditProductView(UpdateView):
     template_name = 'saller/edit_product.html'
     success_url = reverse_lazy('saller-dashboard')
 
-# Soft delete
+
 class DeleteProductView(DeleteView):
     model = Product
     template_name = 'saller/delete_product.html'
@@ -102,12 +105,6 @@ class CustomerRegisterView(CreateView):
     form_class = CustomerRegisterForm
     template_name = 'customer/customer_register.html'
     success_url = 'customer-login'
-
-    def form_valid(self, form):
-        new_product = form.save(commit=False)
-        new_product.be_a_customer = True
-        new_product.save()
-        return super (CustomerRegisterView, self).form_valid(form)
 
 
 class CustomerLoginView(View):
@@ -143,6 +140,30 @@ class CustomerHomePageView(ListView):
         context = super().get_context_data(**kwargs)
         context['category'] = Category.objects.all()
         return context
+
+
+class SearchView(View):
+    def get(self, request):
+        search = request.GET.get('search')
+        qs = Product.objects.filter(product_name__icontains=search)
+        data = None
+        if len(search)>0 and len(qs)>0:
+            data = []
+            for p in qs:
+                items = {
+                    'id':p.id,
+                    'name':p.product_name,
+                    'discription':p.product_discription,
+                    'image':str(p.product_image.url),
+                    'price':p.product_price,
+                    'category':p.product_category.category_name,
+                    'user':p.user.username,
+                    'quantity':p.quantity,
+                }
+                data.append(items)
+        else:
+            data = 'Nothing Found...'
+        return JsonResponse({'data':data})
 
 
 class WishListView(ListView):
@@ -214,3 +235,41 @@ class RemovefromCartView(View):
         Cart.objects.get(id=id).delete()
         return redirect('cart')
 
+class PlusCartView(View):
+    def get(self, request):
+        prod_id = request.GET.get('prod_id')
+        x = Cart.objects.get(Q(id=prod_id) and Q(user=request.user))
+        x.products.quantity+=1
+        x.save()
+        price = [p for p in Cart.objects.all() if p.user == self.request.user]
+        total = 0
+        if price:
+            for i in price:
+                p = i.products.product_price * x.products.quantity
+                total = total + p
+        else:
+            pass
+        data = {'quantity':x.products.quantity, 'total':total}
+        print(x.products.quantity)
+        print(total)
+        return JsonResponse({'data':data})
+
+    
+class MinusCartView(View):
+    def get(self, request):
+        prod_id = request.GET.get('prod_id')
+        x = Cart.objects.get(Q(id=prod_id) and Q(user=request.user))
+        x.products.quantity-=1
+        x.save()
+        price = [p for p in Cart.objects.all() if p.user == self.request.user]
+        total = 0
+        if price:
+            for i in price:
+                p = i.products.product_price * x.products.quantity
+                total = total + p
+        else:
+            pass
+        data = {'quantity':x.products.quantity, 'total':total}
+        print(x.products.quantity)
+        print(total)
+        return JsonResponse({'data':data})
