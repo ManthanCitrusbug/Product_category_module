@@ -16,6 +16,7 @@ class WishListAdmin(admin.ModelAdmin):
 class CartAdmin(admin.ModelAdmin):
     list_display = ['id', 'user', 'products']
 
+
 admin.site.register(UserModel,UserModelAdmin)
 admin.site.register(Product,ProductAdmin)
 admin.site.register(Category)

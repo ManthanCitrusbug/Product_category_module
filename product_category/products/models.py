@@ -73,7 +73,7 @@ class Product(models.Model):
     product_category               = models.ForeignKey(Category, on_delete=models.CASCADE)
     user                           = models.ForeignKey(UserModel,on_delete=models.CASCADE)
     quantity                       = models.PositiveIntegerField(default=1)
-    wish_list                      = models.BooleanField(default=False)
+
 
     def __str__(self):
         return self.product_name

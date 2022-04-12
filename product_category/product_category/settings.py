@@ -86,7 +86,7 @@ AUTH_USER_MODEL =   'products.UserModel'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'product',
+        'NAME': 'products',
         'USER': 'postgres',
         'PASSWORD': 'root',
         'HOST': 'localhost',

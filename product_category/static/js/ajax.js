@@ -1,9 +1,8 @@
 $(document).ready(function () {
     $("#searchbtn").click(function (event) {
         event.preventDefault()
-        let search = $("#searchinput").val()
+        const search = $("#searchinput").val()
         let csrf = $("input[name=csrfmiddlewaretoken]").val()
-        console.log(csrf)
         $.ajax({
             url: 'search',
             method: 'GET',
@@ -12,7 +11,8 @@ $(document).ready(function () {
                 let search_data = data.data
                 console.log(search_data)
                 if(search.length > 0){
-                    $('.hide').empty()
+                    $('.hide').hide()
+                    $('.paginater-hide').hide()
                     $.each(search_data, function(key, val){
                         console.log(val.name)
                         $(".main").append(`
@@ -48,41 +48,30 @@ $(document).ready(function () {
 $(document).ready(function(){
     $(".plus").click(function(event){
         event.preventDefault()
-        const qn = $(this).attr("pid").toString();
-        const qune = this.parentNode.children[1]
-        // console.log(qune)
-        $.ajax({
-            type:'GET',
-            url:'plus-cart',
-            data:{
-                prod_id:qn,
-            },
-            success:function(data){
-                // qun.innerText = data.data.qun
-                qune.innerText = data.data.quantity
-            }
-        })
+        let x = this.parentNode.children[1].innerText
+        let z = parseInt(x);
+        y = z+1
+        this.parentNode.children[1].innerText = ""
+        this.parentNode.children[1].innerText = y   
     });
 });
+
+
 
 $(document).ready(function(){
     $(".minus").click(function(event){
         event.preventDefault()
-        const qn = $(this).attr("pid").toString();
-        const qun = this.parentNode.children[1]
-        console.log(qn)
-        $.ajax({
-            type:'GET',
-            url:'minus-cart',
-            data:{
-                prod_id:qn,
-            },
-            success:function(data){
-                // qun.innerText = data.data.qun
-                $(".total").innerText = data.data.total
-                console.log(data.data.qun)
-                qun.innerText = data.data.quantity
-            }
-        })
+        let x = this.parentNode.children[1].innerText
+        let z = parseInt(x);
+        if(z>0){
+            y = z-1
+        }else{
+            y=0
+        }
+        this.parentNode.children[1].innerText = ""
+        this.parentNode.children[1].innerText = y   
     });
 });
+
+let price = $('.price').attr('pid').val()
+console.log(price);

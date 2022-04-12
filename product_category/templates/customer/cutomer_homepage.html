@@ -23,7 +23,7 @@
         </a>
         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
           {% for obj in category %}
-          <li><a class="dropdown-item" href="#">{{obj.category_name}}</a></li>
+          <li><a class="dropdown-item category" href="#" pid="{{obj.category_name}}">{{obj.category_name}}</a></li>
           {% endfor %}
         </ul>
       </li>
@@ -64,21 +64,29 @@
       <p>Quantity : {{user.quantity}}</p>
       <p>{{user.user}}</p>
       <a class="btn btn-primary btn-lg" href="{% url 'details' user.id %}" role="button">Details</a>
+      {% if user.id in cart %}
+        <a class="btn btn-warning btn-lg" href="{% url 'cart' %}">Go to Cart</a>
+        {% else %}
       <form action="{% url 'add-to-cart' user.id %}" method="POST" class="d-inline mx-1">
         {% csrf_token %}
-        <button class="btn btn-warning btn-lg">Add to cart</button>
+        <button class="btn btn-warning btn-lg">Add to Cart</button>
+        {% endif %}
       </form>
+      {% if user.id in wishlist %}
+      <a class="btn btn-info btn-lg" href="{% url 'wish-list' %}">Go to Wishlist</a>
+      {% else %}
       <form action="{% url 'add-to-wish-list' user.id %}" method="POST" class="d-inline mx-1">
         {% csrf_token %}
         <button class="btn btn-info btn-lg">Add to wish list</button>
       </form>
-    </div>
+      {% endif %}
+    </div>  
     {% endfor %}
 {% endblock content %}
-
+<div class="paginater-hide">
 {% block paginator %}
 {% if is_paginated %}
-<div class="m-4">
+<div class="m-4 paginater-hide">
   <nav>
     <ul class="pagination justify-content-center">
       {% if page_obj.has_previous %}
@@ -93,3 +101,4 @@
 </div>
 {% endif %}
 {% endblock paginator %}
+</div>

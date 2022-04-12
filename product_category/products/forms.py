@@ -138,8 +138,14 @@ class AddProductForm(forms.ModelForm):
             'quantity' : forms.TextInput(
                 attrs={'class' : 'form-control w-50 m-auto'}
             ),
- 
         }
+
+        def save(self, commit=True):
+            user = super().save(commit=False)
+            user.self.cleaned_data['product_image']
+            if commit:
+                user.save()
+            return user
 
 
 class EditProductForm(forms.ModelForm):
@@ -163,3 +169,10 @@ class EditProductForm(forms.ModelForm):
                 attrs={'class' : 'form-control w-50 m-auto'}
             ),
         }
+
+        def save(self, commit=True):
+            user = super().save(commit=False)
+            user(self.cleaned_data['product_image'])
+            if commit:
+                user.save()
+            return user

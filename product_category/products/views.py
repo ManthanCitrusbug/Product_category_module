@@ -1,4 +1,3 @@
-from urllib import request
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.db.models import Q
@@ -78,8 +77,10 @@ class AddProductView(CreateView):
     success_url = 'saller-dashboard'
 
     def form_valid(self, form):
+        image = form.cleaned_data.get('product_image')
         new_product = form.save(commit=False)
         new_product.user = self.request.user
+        new_product.product_image = image
         new_product.save()
         return super(AddProductView, self).form_valid(form)
 
@@ -89,6 +90,13 @@ class EditProductView(UpdateView):
     form_class = EditProductForm
     template_name = 'saller/edit_product.html'
     success_url = reverse_lazy('saller-dashboard')
+
+    def form_valid(self, form):
+        image = form.cleaned_data.get('product_image')
+        new_product = form.save(commit=False)
+        new_product.product_image = image
+        new_product.save()
+        return super(EditProductView, self).form_valid(form)
 
 
 class DeleteProductView(DeleteView):
@@ -139,12 +147,15 @@ class CustomerHomePageView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['category'] = Category.objects.all()
+        context['cart'] = Cart.objects.filter(user=self.request.user).values_list("products__id", flat=True)
+        context['wishlist'] = WishList.objects.filter(user=self.request.user).values_list("products__id", flat=True)
         return context
 
 
 class SearchView(View):
     def get(self, request):
         search = request.GET.get('search')
+        print(search)
         qs = Product.objects.filter(product_name__icontains=search)
         data = None
         if len(search)>0 and len(qs)>0:
@@ -159,7 +170,7 @@ class SearchView(View):
                     'category':p.product_category.category_name,
                     'user':p.user.username,
                     'quantity':p.quantity,
-                }
+                }       
                 data.append(items)
         else:
             data = 'Nothing Found...'
@@ -189,15 +200,6 @@ class CartView(ListView):
         context = super().get_context_data(**kwargs)
         context['category'] = Category.objects.all()
         context['product_list'] = Cart.objects.filter(user=self.request.user)
-        price = [p for p in Cart.objects.all() if p.user == self.request.user]
-        total = 0
-        if price:
-            for i in price:
-                p = i.products.product_price
-                total = total + p
-        else:
-            pass
-        context['total_amount'] = total
         return context
 
 
@@ -209,7 +211,7 @@ class ProductDetailsView(DetailView):
 class AddtoWishListView(View):
     def post(self, request, id):
         product = Product.objects.get(id=id)
-        WishList(id=product.id,user=request.user, products=product).save()
+        WishList(user=request.user,products=product).save()
         return redirect('wish-list')
 
 
@@ -222,7 +224,7 @@ class RemovefromWishListView(View):
 class AddtoCartView(View):
     def post(self, request, id):
         product = Product.objects.get(id=id)
-        Cart(id=product.id,user=request.user, products=product).save()
+        Cart(user=request.user, products=product).save()
         try:
             WishList.objects.get(id=product.id).delete()
         except:
@@ -235,41 +237,29 @@ class RemovefromCartView(View):
         Cart.objects.get(id=id).delete()
         return redirect('cart')
 
+
 class PlusCartView(View):
     def get(self, request):
         prod_id = request.GET.get('prod_id')
-        x = Cart.objects.get(Q(id=prod_id) and Q(user=request.user))
+        x = Cart.objects.get(id=prod_id, user=request.user)
         x.products.quantity+=1
         x.save()
-        price = [p for p in Cart.objects.all() if p.user == self.request.user]
-        total = 0
-        if price:
-            for i in price:
-                p = i.products.product_price * x.products.quantity
-                total = total + p
-        else:
-            pass
-        data = {'quantity':x.products.quantity, 'total':total}
-        print(x.products.quantity)
-        print(total)
+        data = {'quantity':x.products.quantity}
         return JsonResponse({'data':data})
 
     
 class MinusCartView(View):
     def get(self, request):
         prod_id = request.GET.get('prod_id')
-        x = Cart.objects.get(Q(id=prod_id) and Q(user=request.user))
+        x = Cart.objects.get(id=prod_id, user=request.user)
         x.products.quantity-=1
         x.save()
-        price = [p for p in Cart.objects.all() if p.user == self.request.user]
-        total = 0
-        if price:
-            for i in price:
-                p = i.products.product_price * x.products.quantity
-                total = total + p
-        else:
-            pass
-        data = {'quantity':x.products.quantity, 'total':total}
-        print(x.products.quantity)
-        print(total)
+        data = {'quantity':x.products.quantity}
         return JsonResponse({'data':data})
+
+
+class CategoryView(View):
+    def get(self, request):
+        name = request.GET.get('prod_id')
+        print(name)
+        pass
