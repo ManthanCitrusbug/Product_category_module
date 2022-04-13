@@ -21,9 +21,9 @@
             <a class="nav-link" href="{% url 'saller-dashboard' %}">Dash Board</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
+            <!-- <a class="nav-link" href="#">Link</a> -->
             </li>
-            <li class="nav-item dropdown">
+            <!-- <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Dropdown
             </a>
@@ -33,9 +33,9 @@
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#">Something else here</a>
             </div>
-            </li>
+            </li> -->
             <li class="nav-item">
-            <a class="nav-link disabled" href="#">Disabled</a>
+                <a class="nav-link" href="{% url 'saller-logout' %}">Log out</a>
             </li>
         </ul>
         </div>
@@ -48,7 +48,7 @@
 
     {% block content %}
         <h1 class="text-center my-5">Edit a Product</h1>
-        <form action="" method="POST" class="form-control text-center mb-5" novalidate>
+        <form action="" method="POST" class="form-control text-center mb-5" novalidate enctype="multipart/form-data">
             {% csrf_token %}
             <label for="">Product Name :</label><br>
             {{form.product_name}}
@@ -64,6 +64,8 @@
             <span id="error_product_price" class="text-danger"></span><br>
             <label for="">Product Category :</label><br>
             {{form.product_category}}
+            <!-- <label for="">Product Quantity :</label><br> -->
+            {{form.quantity}}
             <span id="error_product_category" class="text-danger"></span><br><br>
             <input type="submit" value="Submit" class="btn btn-success">
         </form>

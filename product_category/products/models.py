@@ -41,6 +41,7 @@ class UserModel(AbstractBaseUser,PermissionsMixin):
     last_name               = models.CharField(max_length=70)
     email                   = models.EmailField(max_length=70, unique=True)
     profile_image           = models.ImageField(upload_to = 'image/', default = 'media/image/defualt_img.jpeg')
+    confirm_password        = models.CharField(max_length=70, default="")
     is_seller           = models.BooleanField(default=False)
 
     is_active               = models.BooleanField(default=True)
@@ -73,6 +74,7 @@ class Product(models.Model):
     product_category               = models.ForeignKey(Category, on_delete=models.CASCADE)
     user                           = models.ForeignKey(UserModel,on_delete=models.CASCADE)
     quantity                       = models.PositiveIntegerField(default=1)
+    is_deleted                     = models.BooleanField(default=False)
 
 
     def __str__(self):
@@ -83,7 +85,6 @@ class WishList(models.Model):
     user                           = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     products                       = models.ForeignKey(Product, on_delete=models.CASCADE)
     
-
 
 class Cart(models.Model):
     user                           = models.ForeignKey(UserModel, on_delete=models.CASCADE)

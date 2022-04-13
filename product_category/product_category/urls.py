@@ -30,6 +30,9 @@ urlpatterns = [
     path('add-product', views.AddProductView.as_view(), name='add-product'),
     path('edit-product/<int:pk>', views.EditProductView.as_view(), name = 'edit-product'),
     path('delete-product/<int:pk>', views.DeleteProductView.as_view(), name = 'delete-product'),
+    path('seller-details/<int:pk>',views.SellerProductDetailsView.as_view(),name='seller-details'),
+    path('seller-category', views.SellerCategoryView.as_view(), name='seller-category'),
+    path('seller-search', views.SellerSearchView.as_view(), name='seller-search'),
 #----------------------------------------------------------------------------------------------------------------------------
     path('customer-register',views.CustomerRegisterView.as_view(), name='customer-register'),
     path('customer-login', views.CustomerLoginView.as_view(), name='customer-login'),
@@ -42,8 +45,10 @@ urlpatterns = [
     path('remove-from-cart/<int:id>',views.RemovefromCartView.as_view(), name='remove-from-cart'),
     path('details/<int:pk>',views.ProductDetailsView.as_view(),name='details'),
     path('search', views.SearchView.as_view(), name='search'),
-    path('plus-cart', views.PlusCartView.as_view(), name='plus-cart'),
-    path('minus-cart', views.MinusCartView.as_view(), name='minus-cart'),
+    # path('plus-price', views.PlusCartView.as_view(), name='plus-cart'),
+    path('filter', views.CategoryView.as_view(), name='filter'),
+    # path('minus-cart', views.MinusCartView.as_view(), name='minus-cart'),
+    path('plus-quantity', views.PlusCartView.as_view(), name='quantity'),
 
 
 ] + static(settings.MEDIA_URL , document_root = settings.MEDIA_ROOT)

@@ -21,9 +21,9 @@
             <a class="nav-link" href="{% url 'saller-dashboard' %}">Dash Board</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
+            <!-- <a class="nav-link" href="#">Link</a> -->
             </li>
-            <li class="nav-item dropdown">
+            <!-- <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Dropdown
             </a>
@@ -33,9 +33,9 @@
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#">Something else here</a>
             </div>
-            </li>
+            </li> -->
             <li class="nav-item">
-            <a class="nav-link disabled" href="#">Disabled</a>
+                <a class="nav-link" href="{% url 'saller-logout' %}">Log out</a>
             </li>
         </ul>
         </div>
@@ -48,7 +48,7 @@
 
     {% block content %}
         <h1 class="text-center my-5">Add a Product</h1>
-        <form action="" method="POST" class="form-control text-center mb-5" novalidate onsubmit="return product_validate()">
+        <form action="" method="POST" class="form-control text-center mb-5" novalidate onsubmit="return product_validate()" enctype="multipart/form-data">
             {% csrf_token %}
             <label for="">Product Name :</label><br>
             {{form.product_name}}

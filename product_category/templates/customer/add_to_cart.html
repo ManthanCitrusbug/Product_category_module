@@ -21,7 +21,7 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
               {% for obj in category %}
-              <li><a class="dropdown-item" href="#">{{obj.category_name}}</a></li>
+              <li><a class="dropdown-item category" pid="{{obj.id}}">{{obj.category_name}}</a></li>
               {% endfor %}
             </ul>
           </li>
@@ -32,8 +32,8 @@
       </ul>
     </div>
     <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="searchinput">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" id="searchinput">Search</button>
       </form>
 </nav>
 {% endblock navbar %}
@@ -43,37 +43,33 @@
 <div class="jumbotron m-5">
     <h1 class="display-4">{{request.user}}'s Cart</h1>
     <p class="lead">Here are products...</p>
-    <p class="lead" id="total">Total amount : ₹{{total_amount}}</p>
+    <p class="lead" id="total">Total amount : ₹<span id="total">{{cart.get_total_price}}</span></p>
     <hr class="my-4 mt-5">  
 </div>
-
-{% for product in product_list %}
-<div class="jumbotron m-5 mt-5">
-  <img src="{{product.products.product_image.url}}" class="image_container" alt="" width="250px" height="250px"> 
-  <h1 class="display-4" id="product_name">{{product.products.product_name}}</h1> 
-  <p class="lead">{{product.products.product_discription}}</p>
+<div class="main"></div>
+{% for cart_product in cart_list %}
+<div class="jumbotron m-5 mt-5 hide">
+  <img src="{{cart_product.products.product_image.url}}" class="image_container" alt="" width="250px" height="250px"> 
+  <h1 class="display-4" id="product_name">{{cart_product.products.product_name}}</h1> 
+  <p class="lead">{{cart_product.products.product_discription}}</p>
   <hr class="my-4">
-  <p class="price" pid="{{product.products.product_price}}">₹{{product.products.product_price}}</p>
-  <p>{{product.products.
-    
-    
-    
-  }}</p>
-  <p class="qn">Quantity :
-    <a href="#" class="text-dark minus" pid="{{product.products.id}}">
+  <p class="price" pid="{{cart_product.products.product_price}}">₹{{cart_product.products.product_price}}</p>
+  <p>{{cart_product.products.product_category}}</p>
+  <p>Quantity :
+    <a href="#" class="text-dark minus" pid="{{cart_product.id}}">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
       <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
     </svg></a>
-     <span class="qune">2</span>
-     <a href="" class="text-dark plus" pid="{{product.products.id}}">
+     <span class="quantity" value="{{cart_product.products.quantity}}">1</span>
+     <a href="" class="text-dark plus" pid="{{cart_product.id}}">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
       <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
     </svg></a>
   </p>
-  <p>{{product.user}}</p>
-  <a class="btn btn-primary btn-lg" href="{% url 'details' product.id %}" role="button">Details</a>  
-  <a class="btn btn-warning btn-lg" href="#" role="button">Buy now</a>
-  <form action="{% url 'remove-from-cart' product.id %}" method="POST" class="d-inline mx-1">
+  <p>{{cart_product.user}}</p>
+  <a class="btn btn-primary btn-lg" href="{% url 'details' cart_product.products.id %}" role="button">Details</a>  
+  <a class="btn btn-warning btn-lg" href="{% url 'quantity' %}" role="button">Buy now</a>
+  <form action="{% url 'remove-from-cart' cart_product.id %}" method="POST" class="d-inline mx-1">
     {% csrf_token %}
     <button class="btn btn-info btn-lg">Remove from cart</button>
   </form>

@@ -11,7 +11,7 @@ from .models import Category, Product, UserModel
 class SallerRegisterForm(forms.ModelForm):
     class Meta:
         model = UserModel
-        fields = ['username', 'first_name', 'last_name', 'email', 'profile_image', 'password']
+        fields = ['username', 'first_name', 'last_name', 'email', 'profile_image', 'password', 'confirm_password']
         widgets = {
             'username' : forms.TextInput(
                 attrs={'class' : 'form-control w-50 m-auto'}
@@ -30,7 +30,10 @@ class SallerRegisterForm(forms.ModelForm):
             ),
             'password' : forms.PasswordInput(
                 attrs={'class' : 'form-control w-50 m-auto'}
-            )
+            ),
+            'confirm_password' : forms.PasswordInput(
+                attrs={'class' : 'form-control w-50 m-auto'}
+            ),
         }
         
 
@@ -68,7 +71,7 @@ class SallerLoginForm(forms.ModelForm):
 class CustomerRegisterForm(forms.ModelForm):
     class Meta:
         model = UserModel
-        fields = ['username', 'first_name', 'last_name', 'email', 'profile_image', 'password']
+        fields = ['username', 'first_name', 'last_name', 'email', 'profile_image', 'password', 'confirm_password']
         widgets = {
             'username' : forms.TextInput(
                 attrs={'class' : 'form-control w-50 m-auto'}
@@ -86,6 +89,9 @@ class CustomerRegisterForm(forms.ModelForm):
                 attrs={'class' : 'form-control w-50 m-auto'}
             ),
             'password' : forms.PasswordInput(
+                attrs={'class' : 'form-control w-50 m-auto'}
+            ),
+            'confirm_password' : forms.PasswordInput(
                 attrs={'class' : 'form-control w-50 m-auto'}
             )
         }
@@ -140,12 +146,6 @@ class AddProductForm(forms.ModelForm):
             ),
         }
 
-        def save(self, commit=True):
-            user = super().save(commit=False)
-            user.self.cleaned_data['product_image']
-            if commit:
-                user.save()
-            return user
 
 
 class EditProductForm(forms.ModelForm):
@@ -170,9 +170,3 @@ class EditProductForm(forms.ModelForm):
             ),
         }
 
-        def save(self, commit=True):
-            user = super().save(commit=False)
-            user(self.cleaned_data['product_image'])
-            if commit:
-                user.save()
-            return user

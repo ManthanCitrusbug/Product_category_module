@@ -2,7 +2,8 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.db.models import Q
 from django.views import View
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+
 from .models import Category, Product, UserModel, WishList, Cart
 from .forms import (SallerRegisterForm, 
                     SallerLoginForm, 
@@ -10,7 +11,7 @@ from .forms import (SallerRegisterForm,
                     CustomerRegisterForm, 
                     AddProductForm, 
                     EditProductForm)
-from django.views.generic import CreateView, TemplateView, ListView, UpdateView, DeleteView, DetailView, View
+from django.views.generic import CreateView, TemplateView, ListView, UpdateView, DetailView, View
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView
 
@@ -60,13 +61,13 @@ class SallerLogoutView(View):
 class SallerDashboardView(ListView):
     model = Product
     template_name = 'saller/saller_dashboard.html'
-    context_object_name = 'product_list'
+    context_object_name = 'seller_list'
     context = {}
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['category'] = Category.objects.all()
-        context['product_list'] = Product.objects.filter(user = self.request.user)
+        context['seller_list'] = Product.objects.filter(user = self.request.user)
         return context
 
 
@@ -99,10 +100,19 @@ class EditProductView(UpdateView):
         return super(EditProductView, self).form_valid(form)
 
 
-class DeleteProductView(DeleteView):
+class SellerProductDetailsView(DetailView):
     model = Product
-    template_name = 'saller/delete_product.html'
-    success_url = reverse_lazy('saller-dashboard')
+    template_name = 'saller/seller_product_detail.html'
+
+
+class DeleteProductView(View):
+    def get(self, request, pk):
+        product = Product.objects.get(id=pk)
+        product.is_deleted = True
+        product.save()
+        return render(request,'saller/saller_dashboard.html')
+
+
 
 #-----------------------------------------------------------------------------------------------------------------------------
 # Customer VIEW    
@@ -136,7 +146,7 @@ class CustomerHomePageView(ListView):
     paginate_by = 5
     model = Product
     context_object_name = 'product_list'
-    queryset = Product.objects.all()
+    queryset = Product.objects.filter(is_deleted = False)
 
     def get_template_names(self):
         return 'customer/cutomer_homepage.html'
@@ -177,29 +187,54 @@ class SearchView(View):
         return JsonResponse({'data':data})
 
 
+class SellerSearchView(View):
+    def get(self, request):
+        search = request.GET.get('search')
+        print(search)
+        qs = Product.objects.filter(product_name__icontains=search, user=request.user)
+        data = None
+        if len(search)>0 and len(qs)>0:
+            data = []
+            for p in qs:
+                items = {
+                    'id':p.id,
+                    'name':p.product_name,
+                    'discription':p.product_discription,
+                    'image':str(p.product_image.url),
+                    'price':p.product_price,
+                    'category':p.product_category.category_name,
+                    'user':p.user.username,
+                    'quantity':p.quantity,
+                }       
+                data.append(items)
+        else:
+            data = 'Nothing Found...'
+        return JsonResponse({'data':data})
+
+
 class WishListView(ListView):
     model = Product
     template_name = 'customer/wish_list.html'
-    context_object_name = 'product_list'
+    context_object_name = 'wish_list'
     context = {}
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['category'] = Category.objects.all()
-        context['product_list'] = WishList.objects.filter(user=self.request.user)
+        context['wish_list'] = WishList.objects.filter(user=self.request.user)
         return context
 
 
 class CartView(ListView):
     model = Cart
     template_name = 'customer/add_to_cart.html'
-    context_object_name = 'product_list'
+    context_object_name = 'cart_list'
     context = {}
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['category'] = Category.objects.all()
-        context['product_list'] = Cart.objects.filter(user=self.request.user)
+        context['cart_list'] = Cart.objects.filter(user=self.request.user)
         return context
 
 
@@ -225,11 +260,8 @@ class AddtoCartView(View):
     def post(self, request, id):
         product = Product.objects.get(id=id)
         Cart(user=request.user, products=product).save()
-        try:
-            WishList.objects.get(id=product.id).delete()
-        except:
-            return redirect('cart')
-        return redirect('wish-list')
+        WishList.objects.filter(products__id=id, user=request.user).delete()
+        return redirect('cart')
 
 
 class RemovefromCartView(View):
@@ -238,28 +270,70 @@ class RemovefromCartView(View):
         return redirect('cart')
 
 
-class PlusCartView(View):
-    def get(self, request):
-        prod_id = request.GET.get('prod_id')
-        x = Cart.objects.get(id=prod_id, user=request.user)
-        x.products.quantity+=1
-        x.save()
-        data = {'quantity':x.products.quantity}
-        return JsonResponse({'data':data})
-
-    
-class MinusCartView(View):
-    def get(self, request):
-        prod_id = request.GET.get('prod_id')
-        x = Cart.objects.get(id=prod_id, user=request.user)
-        x.products.quantity-=1
-        x.save()
-        data = {'quantity':x.products.quantity}
-        return JsonResponse({'data':data})
-
-
 class CategoryView(View):
     def get(self, request):
-        name = request.GET.get('prod_id')
-        print(name)
-        pass
+        id = request.GET.get('id')
+        cat_filter = Category.objects.get(id=id)
+        qs = Product.objects.filter(product_category=cat_filter)
+        data = []
+        for p in qs:
+            items = {
+                'id':p.id,
+                'name':p.product_name,
+                'discription':p.product_discription,
+                'image':str(p.product_image.url),
+                'price':p.product_price,
+                'category':p.product_category.category_name,
+                'user':p.user.username,
+                'quantity':p.quantity,
+            }       
+            data.append(items)
+        print(data)
+        return JsonResponse({'data':data})
+
+
+class SellerCategoryView(CategoryView):
+    def get(self, request):
+        id = request.GET.get('id')
+        cat_filter = Category.objects.get(id=id)
+        qs = Product.objects.filter(product_category=cat_filter, user=request.user)
+        data = []
+        for p in qs:
+            items = {
+                'id':p.id,
+                'name':p.product_name,
+                'discription':p.product_discription,
+                'image':str(p.product_image.url),
+                'price':p.product_price,
+                'category':p.product_category.category_name,
+                'user':p.user.username,
+                'quantity':p.quantity,
+            }       
+            data.append(items)
+        print(data)
+        return JsonResponse({'data':data})
+
+
+# class BuyProductView(View):
+#     def get(self, request):
+#         prod_id = request.GET.get('id')
+#         print(prod_id)
+#         prod_qun = request.GET.get('quantity')
+#         print(prod_qun)
+#         prod_cat = Cart.objects.filter(id=prod_id)
+#         print(prod_cat)
+#         return redirect('customer-homepage')
+
+
+
+class PlusCartView(View):
+    def get(self, request):
+        prod_id = request.GET.get('id')
+        print(prod_id)
+        prod_qun = request.GET.get('quantity')
+        print(prod_qun)
+        prod_cat = Cart.objects.filter(id=prod_id)
+        print(prod_cat)
+        return JsonResponse({'data':"done..."})
+
+

@@ -33,7 +33,9 @@
             <label for="">Password :</label><br>
             {{form.password}}
             <span id="error_password" class="text-danger"></span><br><br>
-            <input type="hidden" value="True" name="customer">
+            <label for="">Confirm Password :</label><br>
+            {{form.confirm_password}}
+            <span id="error_c_password" class="text-danger"></span><br><br>
             <input type="submit" value="Submit" class="btn btn-success">
         </form>
     </section>

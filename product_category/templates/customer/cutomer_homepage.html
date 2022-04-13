@@ -23,7 +23,7 @@
         </a>
         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
           {% for obj in category %}
-          <li><a class="dropdown-item category" href="#" pid="{{obj.category_name}}">{{obj.category_name}}</a></li>
+          <li><a class="dropdown-item category" pid="{{obj.id}}">{{obj.category_name}}</a></li>
           {% endfor %}
         </ul>
       </li>
@@ -53,29 +53,29 @@
   <hr class="my-4 mt-5">
 </div>
 <div class="main"></div>
-    {% for user in product_list %}
+    {% for product in product_list %}
     <div class="jumbotron m-5 mt-5 hide">
-      <img src="{{user.product_image.url}}" class="image_container" alt="" width="250px" height="250px">
-      <h1 class="display-4" id="product_name">{{user.product_name}}</h1>
-      <p class="lead">{{user.product_discription}}</p>
+      <img src="{{product.product_image.url}}" class="image_container" alt="" width="250px" height="250px">
+      <h1 class="display-4" id="product_name">{{product.product_name}}</h1>
+      <p class="lead">{{product.product_discription}}</p>
       <hr class="my-4">
-      <p>₹{{user.product_price}}</p>
-      <p>{{user.product_category}}</p>
-      <p>Quantity : {{user.quantity}}</p>
-      <p>{{user.user}}</p>
-      <a class="btn btn-primary btn-lg" href="{% url 'details' user.id %}" role="button">Details</a>
-      {% if user.id in cart %}
+      <p>₹{{product.product_price}}</p>
+      <p>{{product.product_category}}</p>
+      <p>Quantity : {{product.quantity}}</p>
+      <p>{{product.user}}</p>
+      <a class="btn btn-primary btn-lg" href="{% url 'details' product.id %}" role="button">Details</a>
+      {% if product.id in cart %}
         <a class="btn btn-warning btn-lg" href="{% url 'cart' %}">Go to Cart</a>
         {% else %}
-      <form action="{% url 'add-to-cart' user.id %}" method="POST" class="d-inline mx-1">
+      <form action="{% url 'add-to-cart' product.id %}" method="POST" class="d-inline mx-1">
         {% csrf_token %}
         <button class="btn btn-warning btn-lg">Add to Cart</button>
         {% endif %}
       </form>
-      {% if user.id in wishlist %}
+      {% if product.id in wishlist %}
       <a class="btn btn-info btn-lg" href="{% url 'wish-list' %}">Go to Wishlist</a>
       {% else %}
-      <form action="{% url 'add-to-wish-list' user.id %}" method="POST" class="d-inline mx-1">
+      <form action="{% url 'add-to-wish-list' product.id %}" method="POST" class="d-inline mx-1">
         {% csrf_token %}
         <button class="btn btn-info btn-lg">Add to wish list</button>
       </form>

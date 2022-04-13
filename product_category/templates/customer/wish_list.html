@@ -21,7 +21,7 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
               {% for obj in category %}
-              <li><a class="dropdown-item" href="#">{{obj.category_name}}</a></li>
+              <li><a class="dropdown-item category" href="#" pid="{{obj.id}}">{{obj.category_name}}</a></li>
               {% endfor %}
             </ul>
           </li>
@@ -32,8 +32,8 @@
       </ul>
     </div>
     <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="searchinput">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" id="searchbtn">Search</button>
       </form>
 </nav>
 {% endblock navbar %}
@@ -46,31 +46,29 @@
     <p class="lead">{{total_price}}</p>
     <hr class="my-4 mt-5">  
 </div>
-
-{% for product in product_list %}
-<div class="jumbotron m-5 mt-5">
-  <img src="{{product.products.product_image.url}}" class="image_container" alt="" width="250px" height="250px"> 
-  <h1 class="display-4" id="product_name">{{product.products.product_name}}</h1> 
-  <p class="lead">{{product.products.product_discription}}</p>
-  <hr class="my-4">
-  <p>₹{{product.products.product_price}}</p>
-  <p>{{product.products.product_category}}</p>
-  <p>Quantity : {{product.products.quantity}}</p>
-  <p>{{product.user}}</p>
-  <a class="btn btn-primary btn-lg" href="{% url 'details' product.id %}" role="button">Details</a>  
-  <!-- <a class="btn btn-warning btn-lg" href="{% url 'add-to-cart' product.id %}" role="button">Add to cart</a>
-  <a class="btn btn-info btn-lg" href="{% url 'remove-from-wish-list' product.id %}" role="button">Remove from wish list</a> -->
-  <form action="{% url 'add-to-cart' product.id %}" method="POST" class="d-inline mx-1">
-    {% csrf_token %}
-    <button class="btn btn-warning btn-lg">Add to cart</button>
-  </form>
-  <form action="{% url 'remove-from-wish-list' product.id %}" method="POST" class="d-inline mx-1">
-    {% csrf_token %}
-    <button class="btn btn-info btn-lg">Remove from wish list</button>
-  </form>
-
-</div>
-{% endfor %}
+<div class="main"></div>
+    {% for wish_list in wish_list %}
+    {{wish_list.products.id}}
+    <div class="jumbotron m-5 mt-5 hide">
+      <img src="{{wish_list.products.product_image.url}}" class="image_container" alt="" width="250px" height="250px"> 
+      <h1 class="display-4" id="product_name">{{wish_list.products.product_name}}</h1> 
+      <p class="lead">{{wish_list.products.product_discription}}</p>
+      <hr class="my-4">
+      <p>₹{{wish_list.products.product_price}}</p>
+      <p>{{wish_list.products.product_category}}</p>
+      <p>Quantity : {{wish_list.products.quantity}}</p>
+      <p>{{wish_list.user}}</p>
+      <a class="btn btn-primary btn-lg" href="{% url 'details' wish_list.id %}" role="button">Details</a>  
+      <form action="{% url 'add-to-cart' wish_list.products.id %}" method="POST" class="d-inline mx-1">
+        {% csrf_token %}
+        <button class="btn btn-warning btn-lg">Add to cart</button>
+      </form>
+      <form action="{% url 'remove-from-wish-list' wish_list.id %}" method="POST" class="d-inline mx-1">
+        {% csrf_token %}
+        <button class="btn btn-info btn-lg">Remove from wish list</button>
+      </form>
+    </div>
+    {% endfor %}
 {% endblock content %}
 
 {% block paginator %}

@@ -21,7 +21,7 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
               {% for obj in category %}
-              <li><a class="dropdown-item" href="#">{{obj.category_name}}</a></li>
+              <li><a class="dropdown-item seller-category" pid="{{obj.id}}">{{obj.category_name}}</a></li>
               {% endfor %}
             </ul>
           </li>
@@ -32,8 +32,8 @@
       </ul>
     </div>
     <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="sellersearchinput">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" id="sellersearchbtn">Search</button>
       </form>
 </nav>
 {% endblock navbar %}
@@ -43,22 +43,23 @@
     <p class="lead">Here are your products...</p>
     <hr class="my-4 mt-5">
 </div>
-
-{% for user in product_list %}
-<div class="jumbotron m-5 mt-5">
-  <img src="{{user.product_image.url}}" class="image_container" alt="" width="250px" height="250px"> 
-  <h1 class="display-4" id="product_name">{{user.product_name}}</h1> 
-  <p class="lead">{{user.product_discription}}</p>
+<div class="main"></div>
+{% for seller_product in seller_list %}
+<div class="jumbotron m-5 mt-5 hide">
+  <img src="{{seller_product.product_image.url}}" class="image_container" alt="" width="250px" height="250px"> 
+  <h1 class="display-4" id="product_name">{{seller_product.product_name}}</h1> 
+  <p class="lead">{{seller_product.product_discription}}</p>
   <hr class="my-4">
-  <p>₹{{user.product_price}}</p>
-  <p>{{user.product_category}}</p>
-  <p>Quantity : {{user.quantity}}</p>
-  <p>{{user.user}}</p>
-  <a class="btn btn-primary btn-lg" href="{% url 'details' user.id %}" role="button">Details</a>  
-  <a class="btn btn-warning btn-lg" href="{% url 'edit-product' user.id %}" role="button">Edit</a>
-  <a class="btn btn-danger btn-lg" href="{% url 'delete-product' user.id %}" role="button">Delete</a>
+  <p>₹{{seller_product.product_price}}</p>
+  <p>{{seller_product.product_category}}</p>
+  <p>Quantity : {{seller_product.quantity}}</p>
+  <p>{{seller_product.user}}</p>
+  <a class="btn btn-primary btn-lg" href="{% url 'seller-details' seller_product.id %}" role="button">Details</a>  
+  <a class="btn btn-warning btn-lg" href="{% url 'edit-product' seller_product.id %}" role="button">Edit</a>
+  <a class="btn btn-danger btn-lg" href="{% url 'delete-product' seller_product.id %}" role="button">Delete</a>
 </div>
 {% endfor %}
+<script defer src="{% static 'js/filter.js' %}"></script>
 {% endblock content %}
 {% block paginator %}
 {% endblock paginator %}

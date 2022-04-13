@@ -5,7 +5,7 @@ function validate(){
     const email = document.getElementById("id_email").value;
     var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
     const password = document.getElementById("id_password").value;
-    // const c_password = document.getElementById("c_password").value;
+    const c_password = document.getElementById("id_confirm_password").value;
     var submition = 1;
 
     if(username == ""){
@@ -88,23 +88,27 @@ function validate(){
         submition = 1;
     }
 
-    // if(c_password == ""){
-    //     document.getElementById("error_c_password").innerHTML = "Confirm your password."
-    //     submition = 0;
-    // }
+    if(c_password == ""){
+        document.getElementById("error_c_password").innerHTML = "Confirm your password."
+        submition = 0;
+    }
 
-    // else if(password != c_password){
-    //     document.getElementById("error_c_password").innerHTML = "Your password doesn't match."
-    //     submition = 0;
-    // }
+    else if(password != c_password){
+        document.getElementById("error_c_password").innerHTML = "Your password doesn't match."
+        submition = 0;
+    }
 
-    // else{
-    //     document.getElementById("error_c_password").innerHTML = "";
-    //     submition = 1;
-    // }
+    else if((password.length <= 6) || (password.length >= 13)){
+        document.getElementById("error_password").innerHTML = "Password must be in 6 to 13 charactors.";
+        submition = 0;
+    }
+
+    else{
+        document.getElementById("error_c_password").innerHTML = "";
+        submition = 1;
+    }
 
     if(submition===1){
-        // document.getElementById("submit").innerHTML = "Submited";
         return true;
     }
     else{
@@ -167,7 +171,7 @@ function product_validate(){
     const product_img = document.getElementById("id_product_image").value;
     const product_price = document.getElementById("id_product_price").value;
     const product_category = document.getElementById("id_product_category").value;
-    const quantity = document.getElementById("id_quantity").value;
+    // const quantity = document.getElementById("id_quantity").value;
 
     var submition = 1;
 
@@ -226,18 +230,18 @@ function product_validate(){
         submition = 1;
     }
 
-    if(quantity == ""){
-        document.getElementById("error_quantity").innerHTML = "Enter Product Quantity.";
-        submition = 0;
-    }
-    else if(isNaN(quantity)){
-        document.getElementById("error_quantity").innerHTML = "Enter a valid product quantity."
-        submition = 0;
-    }
-    else{
-        document.getElementById("error_quantity").innerHTML = "";
-        submition = 1;
-    }
+    // if(quantity == ""){
+    //     document.getElementById("error_quantity").innerHTML = "Enter Product Quantity.";
+    //     submition = 0;
+    // }
+    // else if(isNaN(quantity)){
+    //     document.getElementById("error_quantity").innerHTML = "Enter a valid product quantity."
+    //     submition = 0;
+    // }
+    // else{
+    //     document.getElementById("error_quantity").innerHTML = "";
+    //     submition = 1;
+    // }
 
 
     if(submition===1){
