@@ -45,7 +45,8 @@ class SallerLoginView(View):
                 login(request, user)
                 return redirect('saller-dashboard')
         else:
-            return render(request,'saller/saller_login.html',{'form':form})
+            msg = "Invalid details"
+            return render(request,'saller/saller_login.html',{'form':form, 'msg':msg})
 
     def get(self,request):
         form = SallerLoginForm()
@@ -86,18 +87,58 @@ class AddProductView(CreateView):
         return super(AddProductView, self).form_valid(form)
 
 
+class SellerCategoryView(View):
+    def get(self, request):
+        id = request.GET.get('id')
+        cat_filter = Category.objects.get(id=id)
+        qs = Product.objects.filter(product_category=cat_filter, user=request.user)
+        data = []
+        for p in qs:
+            items = {
+                'id':p.id,
+                'name':p.product_name,
+                'discription':p.product_discription,
+                'image':str(p.product_image.url),
+                'price':p.product_price,
+                'category':p.product_category.category_name,
+                'user':p.user.username,
+                'quantity':p.quantity,
+            }       
+            data.append(items)
+        print(data)
+        return JsonResponse({'data':data})
+
+    
+class SellerSearchView(View):
+    def get(self, request):
+        search = request.GET.get('search')
+        print(search)
+        qs = Product.objects.filter(product_name__icontains=search, user=request.user)
+        data = None
+        if len(search)>0 and len(qs)>0:
+            data = []
+            for p in qs:
+                items = {
+                    'id':p.id,
+                    'name':p.product_name,
+                    'discription':p.product_discription,
+                    'image':str(p.product_image.url),
+                    'price':p.product_price,
+                    'category':p.product_category.category_name,
+                    'user':p.user.username,
+                    'quantity':p.quantity,
+                }       
+                data.append(items)
+        else:
+            data = 'Nothing Found...'
+        return JsonResponse({'data':data})
+
+
 class EditProductView(UpdateView):
     model = Product
     form_class = EditProductForm
     template_name = 'saller/edit_product.html'
     success_url = reverse_lazy('saller-dashboard')
-
-    def form_valid(self, form):
-        image = form.cleaned_data.get('product_image')
-        new_product = form.save(commit=False)
-        new_product.product_image = image
-        new_product.save()
-        return super(EditProductView, self).form_valid(form)
 
 
 class SellerProductDetailsView(DetailView):
@@ -111,7 +152,6 @@ class DeleteProductView(View):
         product.is_deleted = True
         product.save()
         return render(request,'saller/saller_dashboard.html')
-
 
 
 #-----------------------------------------------------------------------------------------------------------------------------
@@ -135,7 +175,8 @@ class CustomerLoginView(View):
             login(request, user)
             return redirect('customer-homepage')
         else:
-            return render(request,'customer/customer_login.html',{'form':form}) 
+            msg = "Invalid details"
+            return render(request,'customer/customer_login.html',{'form':form, 'msg':msg}) 
 
     def get(self,request):
         form = CutomerLoginForm()
@@ -146,6 +187,7 @@ class CustomerHomePageView(ListView):
     paginate_by = 5
     model = Product
     context_object_name = 'product_list'
+    ordering = ['id']
     queryset = Product.objects.filter(is_deleted = False)
 
     def get_template_names(self):
@@ -156,6 +198,7 @@ class CustomerHomePageView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['total_products'] = Product.objects.all().count
         context['category'] = Category.objects.all()
         context['cart'] = Cart.objects.filter(user=self.request.user).values_list("products__id", flat=True)
         context['wishlist'] = WishList.objects.filter(user=self.request.user).values_list("products__id", flat=True)
@@ -187,35 +230,11 @@ class SearchView(View):
         return JsonResponse({'data':data})
 
 
-class SellerSearchView(View):
-    def get(self, request):
-        search = request.GET.get('search')
-        print(search)
-        qs = Product.objects.filter(product_name__icontains=search, user=request.user)
-        data = None
-        if len(search)>0 and len(qs)>0:
-            data = []
-            for p in qs:
-                items = {
-                    'id':p.id,
-                    'name':p.product_name,
-                    'discription':p.product_discription,
-                    'image':str(p.product_image.url),
-                    'price':p.product_price,
-                    'category':p.product_category.category_name,
-                    'user':p.user.username,
-                    'quantity':p.quantity,
-                }       
-                data.append(items)
-        else:
-            data = 'Nothing Found...'
-        return JsonResponse({'data':data})
-
-
 class WishListView(ListView):
     model = Product
     template_name = 'customer/wish_list.html'
     context_object_name = 'wish_list'
+    ordering = ['id']
     context = {}
 
     def get_context_data(self, **kwargs):
@@ -229,6 +248,7 @@ class CartView(ListView):
     model = Cart
     template_name = 'customer/add_to_cart.html'
     context_object_name = 'cart_list'
+    ordering = ['id']
     context = {}
 
     def get_context_data(self, **kwargs):
@@ -292,48 +312,11 @@ class CategoryView(View):
         return JsonResponse({'data':data})
 
 
-class SellerCategoryView(CategoryView):
-    def get(self, request):
-        id = request.GET.get('id')
-        cat_filter = Category.objects.get(id=id)
-        qs = Product.objects.filter(product_category=cat_filter, user=request.user)
-        data = []
-        for p in qs:
-            items = {
-                'id':p.id,
-                'name':p.product_name,
-                'discription':p.product_discription,
-                'image':str(p.product_image.url),
-                'price':p.product_price,
-                'category':p.product_category.category_name,
-                'user':p.user.username,
-                'quantity':p.quantity,
-            }       
-            data.append(items)
-        print(data)
-        return JsonResponse({'data':data})
-
-
-# class BuyProductView(View):
-#     def get(self, request):
-#         prod_id = request.GET.get('id')
-#         print(prod_id)
-#         prod_qun = request.GET.get('quantity')
-#         print(prod_qun)
-#         prod_cat = Cart.objects.filter(id=prod_id)
-#         print(prod_cat)
-#         return redirect('customer-homepage')
-
-
-
 class PlusCartView(View):
     def get(self, request):
         prod_id = request.GET.get('id')
-        print(prod_id)
         prod_qun = request.GET.get('quantity')
-        print(prod_qun)
+        print(int(prod_qun))
         prod_cat = Cart.objects.filter(id=prod_id)
         print(prod_cat)
         return JsonResponse({'data':"done..."})
-
-

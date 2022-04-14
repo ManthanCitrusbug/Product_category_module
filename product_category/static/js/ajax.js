@@ -72,10 +72,10 @@ $(document).ready(function(){
         event.preventDefault()
         let x = this.parentNode.children[1].innerText
         let z = parseInt(x);
-        if(z>0){
+        if(z>1){
             y = z-1
         }else{
-            y=0
+            y=1
         }
         this.parentNode.children[1].innerText = ""
         this.parentNode.children[1].innerText = y   

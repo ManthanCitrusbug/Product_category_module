@@ -45,9 +45,7 @@ urlpatterns = [
     path('remove-from-cart/<int:id>',views.RemovefromCartView.as_view(), name='remove-from-cart'),
     path('details/<int:pk>',views.ProductDetailsView.as_view(),name='details'),
     path('search', views.SearchView.as_view(), name='search'),
-    # path('plus-price', views.PlusCartView.as_view(), name='plus-cart'),
     path('filter', views.CategoryView.as_view(), name='filter'),
-    # path('minus-cart', views.MinusCartView.as_view(), name='minus-cart'),
     path('plus-quantity', views.PlusCartView.as_view(), name='quantity'),
 
 

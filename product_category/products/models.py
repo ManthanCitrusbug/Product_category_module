@@ -1,5 +1,6 @@
-import uuid
 from django.db import models
+from decimal import Decimal
+from django.db.models import F, Sum
 from django.contrib.auth.models import User, AbstractBaseUser, BaseUserManager, PermissionsMixin
 # Create your models here.
 
