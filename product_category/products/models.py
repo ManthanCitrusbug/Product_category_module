@@ -1,8 +1,6 @@
 from django.db import models
-from decimal import Decimal
-from django.db.models import F, Sum
-from django.contrib.auth.models import User, AbstractBaseUser, BaseUserManager, PermissionsMixin
-# Create your models here.
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, username, password = None):
@@ -43,7 +41,7 @@ class UserModel(AbstractBaseUser,PermissionsMixin):
     email                   = models.EmailField(max_length=70, unique=True)
     profile_image           = models.ImageField(upload_to = 'image/', default = 'media/image/defualt_img.jpeg')
     confirm_password        = models.CharField(max_length=70, default="")
-    is_seller           = models.BooleanField(default=False)
+    is_seller               = models.BooleanField(default=False)
 
     is_active               = models.BooleanField(default=True)
     is_admin                = models.BooleanField(default=False)

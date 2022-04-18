@@ -1,8 +1,11 @@
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.db.models import Q
+from django.db.models import Sum
 from django.views import View
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
+from django.db.models.functions import Concat
+from django.db.models import Value
 
 from .models import Category, Product, UserModel, WishList, Cart
 from .forms import (SallerRegisterForm, 
@@ -13,7 +16,20 @@ from .forms import (SallerRegisterForm,
                     EditProductForm)
 from django.views.generic import CreateView, TemplateView, ListView, UpdateView, DetailView, View
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.views import LoginView
+
+
+cart_prod = Cart.objects.filter(user__id=2).values_list('products__product_name')
+print('**********',cart_prod)
+wish_prod = Product.objects.filter(wishlist__user__id=1).values()
+print('**********',wish_prod)
+# user_search = UserModel.objects.filter(Q(first_name__icontains="n") or Q(last_name__icontains="v")).values_list('first_name', 'last_name')
+user_search = UserModel.objects.annotate(search=Concat('first_name', Value(' '), 'last_name')).filter(search__icontains='kh')
+print('**********',user_search)
+wish = WishList.objects.filter(user__id=4, products__product_category__category_name__icontains='sho').values_list('products__product_name')
+print('**********',wish)
+cart = Cart.objects.filter(user__id=2, products__product_category__category_name__icontains='el').values_list('products__product_name', 'user__first_name')
+print('**********',cart)
+
 
 
 #-----------------------------------------------------------------------------------------------------------------------------
@@ -198,7 +214,7 @@ class CustomerHomePageView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['total_products'] = Product.objects.all().count
+        context['total_products'] = Product.objects.all().count()
         context['category'] = Category.objects.all()
         context['cart'] = Cart.objects.filter(user=self.request.user).values_list("products__id", flat=True)
         context['wishlist'] = WishList.objects.filter(user=self.request.user).values_list("products__id", flat=True)
@@ -254,6 +270,7 @@ class CartView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['category'] = Category.objects.all()
+        context['total_price'] = Cart.objects.filter(user=self.request.user).aggregate(total=Sum('products__product_price'))
         context['cart_list'] = Cart.objects.filter(user=self.request.user)
         return context
 
@@ -308,15 +325,23 @@ class CategoryView(View):
                 'quantity':p.quantity,
             }       
             data.append(items)
-        print(data)
         return JsonResponse({'data':data})
+
+
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
 
 class PlusCartView(View):
     def get(self, request):
         prod_id = request.GET.get('id')
         prod_qun = request.GET.get('quantity')
-        print(int(prod_qun))
-        prod_cat = Cart.objects.filter(id=prod_id)
-        print(prod_cat)
-        return JsonResponse({'data':"done..."})
+        if is_ajax(request):
+            prod_cat = Cart.objects.get(id=prod_id)
+            new_id = prod_cat.products.id
+            x = prod_cat.products.quantity - int(prod_qun)
+            new_prod = Product.objects.get(id=new_id)
+            # new_qun = new_prod(quantity=x)
+            # new_qun.save()
+            return JsonResponse({'data':"done..."})
+        return render(request, 'customer/cutomer_homepage.html')

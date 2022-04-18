@@ -58,7 +58,7 @@
       <p>{{wish_list.products.product_category}}</p>
       <p>Quantity : {{wish_list.products.quantity}}</p>
       <p>{{wish_list.user}}</p>
-      <a class="btn btn-primary btn-lg" href="{% url 'details' wish_list.id %}" role="button">Details</a>  
+      <a class="btn btn-primary btn-lg" href="{% url 'details' wish_list.products.id %}" role="button">Details</a>  
       <form action="{% url 'add-to-cart' wish_list.products.id %}" method="POST" class="d-inline mx-1">
         {% csrf_token %}
         <button class="btn btn-warning btn-lg">Add to cart</button>
