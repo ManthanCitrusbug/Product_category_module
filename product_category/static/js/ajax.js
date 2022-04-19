@@ -49,18 +49,20 @@ $(document).ready(function(){
     $(".plus").click(function(event){
         event.preventDefault()
         let pid = $(this).attr('pid')
+        let val = $(this).attr('val')
+        console.log(val);
         let x = this.parentNode.children[1].innerText
         let z = parseInt(x);
-        y = z+1
+        console.log(z);
+        if(z<val)
+            y = z+1
         this.parentNode.children[1].innerText = ""
         this.parentNode.children[1].innerText = y
-        console.log(y);
         $.ajax({
             url: 'plus-quantity',
             method: 'GET',
             data: {'quantity':y, 'id':pid},
             success: function(data){
-                console.log(data.data);
             }
         })   
     });
@@ -70,6 +72,7 @@ $(document).ready(function(){
 $(document).ready(function(){
     $(".minus").click(function(event){
         event.preventDefault()
+        let pid = $(this).attr('pid')
         let x = this.parentNode.children[1].innerText
         let z = parseInt(x);
         if(z>1){
@@ -79,6 +82,13 @@ $(document).ready(function(){
         }
         this.parentNode.children[1].innerText = ""
         this.parentNode.children[1].innerText = y   
+        $.ajax({
+            url: 'minus-quantity',
+            method: 'GET',
+            data: {'quantity':y, 'id':pid},
+            success: function(data){
+            }
+        })
     });
 });
 

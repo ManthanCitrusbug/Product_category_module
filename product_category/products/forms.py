@@ -2,7 +2,7 @@ from dataclasses import fields
 from pyexpat import model
 from tkinter import Widget
 from django import forms
-from .models import Category, Product, UserModel
+from .models import Category, Product, UserModel, Comments
 
 #-----------------------------------------------------------------------------------------------------------------------------
 # Saller Form   
@@ -167,4 +167,6 @@ class EditProductForm(forms.ModelForm):
                 attrs={'class' : 'form-control w-50 m-auto'}
             ),
         }
+
+
 

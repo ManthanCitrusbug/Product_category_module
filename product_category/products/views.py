@@ -1,3 +1,9 @@
+from asyncio.windows_events import NULL
+from importlib.resources import contents
+from itertools import product
+from multiprocessing import context
+from unittest import result
+from urllib import request
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.db.models import Q
@@ -7,7 +13,9 @@ from django.http import JsonResponse
 from django.db.models.functions import Concat
 from django.db.models import Value
 
-from .models import Category, Product, UserModel, WishList, Cart
+import products
+
+from .models import Category, Product, UserModel, WishList, Cart, OrderedProducts, Comments
 from .forms import (SallerRegisterForm, 
                     SallerLoginForm, 
                     CutomerLoginForm, 
@@ -18,17 +26,19 @@ from django.views.generic import CreateView, TemplateView, ListView, UpdateView,
 from django.contrib.auth import authenticate, login, logout
 
 
-cart_prod = Cart.objects.filter(user__id=2).values_list('products__product_name')
-print('**********',cart_prod)
-wish_prod = Product.objects.filter(wishlist__user__id=1).values()
-print('**********',wish_prod)
-# user_search = UserModel.objects.filter(Q(first_name__icontains="n") or Q(last_name__icontains="v")).values_list('first_name', 'last_name')
-user_search = UserModel.objects.annotate(search=Concat('first_name', Value(' '), 'last_name')).filter(search__icontains='kh')
-print('**********',user_search)
-wish = WishList.objects.filter(user__id=4, products__product_category__category_name__icontains='sho').values_list('products__product_name')
-print('**********',wish)
-cart = Cart.objects.filter(user__id=2, products__product_category__category_name__icontains='el').values_list('products__product_name', 'user__first_name')
-print('**********',cart)
+# cart_prod = Cart.objects.filter(user__id=2).values_list('products__product_name')
+# print('**********',cart_prod)
+# wish_prod = Product.objects.filter(wishlist__user__id=1).values()
+# print('**********',wish_prod)
+# # user_search = UserModel.objects.filter(Q(first_name__icontains="n") or Q(last_name__icontains="v")).values_list('first_name', 'last_name')
+# user_search = UserModel.objects.annotate(search=Concat('first_name', Value(' '), 'last_name')).filter(search__icontains='kh')
+# print('**********',user_search)
+# wish = WishList.objects.filter(user__id=4, products__product_category__category_name__icontains='sho').values_list('products__product_name')
+# print('**********',wish)
+# cart = Cart.objects.filter(user__id=2, products__product_category__category_name__icontains='el').values_list('products__product_name', 'user__first_name')
+# print('**********',cart)
+# join = Cart.objects.only('user').union(WishList.objects.only('user'))
+# print('**********',join)
 
 
 
@@ -218,6 +228,7 @@ class CustomerHomePageView(ListView):
         context['category'] = Category.objects.all()
         context['cart'] = Cart.objects.filter(user=self.request.user).values_list("products__id", flat=True)
         context['wishlist'] = WishList.objects.filter(user=self.request.user).values_list("products__id", flat=True)
+        context['ordered'] = OrderedProducts.objects.filter(user=self.request.user).values_list('products__id', flat=True)
         return context
 
 
@@ -278,6 +289,22 @@ class CartView(ListView):
 class ProductDetailsView(DetailView):
     model = Product
     template_name = 'customer/details.html'
+    context = {}
+
+    def get_context_data(self, **kwargs):
+        pk = self.kwargs.get('pk')
+        context = super().get_context_data(**kwargs)
+        context['ordered'] = OrderedProducts.objects.filter(user=self.request.user).values_list('products__id', flat=True)
+        context['comments'] = Comments.objects.filter(products__id=pk)
+        return context
+        
+    def post(self, request, pk):
+        com = self.request.POST['comments']
+        rate = self.request.POST['rate']
+        print(rate)
+        prod = Product.objects.get(id=pk)
+        Comments(user=self.request.user, products=prod, comments=com).save()
+        return redirect('customer-homepage')
 
 
 class AddtoWishListView(View):
@@ -328,20 +355,39 @@ class CategoryView(View):
         return JsonResponse({'data':data})
 
 
-def is_ajax(request):
-    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+# def is_ajax(request):
+#     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
 
 class PlusCartView(View):
     def get(self, request):
         prod_id = request.GET.get('id')
+        print('id',prod_id)
         prod_qun = request.GET.get('quantity')
-        if is_ajax(request):
-            prod_cat = Cart.objects.get(id=prod_id)
-            new_id = prod_cat.products.id
-            x = prod_cat.products.quantity - int(prod_qun)
-            new_prod = Product.objects.get(id=new_id)
-            # new_qun = new_prod(quantity=x)
-            # new_qun.save()
-            return JsonResponse({'data':"done..."})
-        return render(request, 'customer/cutomer_homepage.html')
+        print('qun',prod_qun)
+        cart_qun = Cart.objects.filter(id=prod_id).update(quantity=prod_qun)
+        print(cart_qun)
+        return redirect('customer-homepage')
+
+    
+class MinusCartView(View):
+    def get(self, request):
+        prod_id = request.GET.get('id')
+        print('id',prod_id)
+        prod_qun = request.GET.get('quantity')
+        print('qun',prod_qun)
+        cart_qun = Cart.objects.filter(id=prod_id).update(quantity=prod_qun)
+        print(cart_qun)
+        return redirect('customer-homepage')
+
+
+class BuyProductView(View):
+    def post(self, request, id):
+        cart = Cart.objects.get(products__id=id, user=request.user)
+        prod = Product.objects.get(id=id)
+        print(prod)
+        qun = prod.quantity - cart.quantity
+        Product.objects.filter(id=id).update(quantity=qun)
+        OrderedProducts(products=prod, user=request.user, quantity=cart.quantity).save()
+        Cart.objects.filter(products__id=id).delete()
+        return redirect('customer-homepage')

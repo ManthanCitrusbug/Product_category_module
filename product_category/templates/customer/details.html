@@ -15,17 +15,6 @@
           <a class="nav-link" href="{% url 'cart' %}">{{request.user}}'s Cart</a>
         </li>
         <li class="nav-item dropdown">
-          <!-- <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Categoris
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              {% for obj in category %}
-              <li><a class="dropdown-item category" href="#" pid="{{obj.id}}">{{obj.category_name}}</a></li>
-              {% endfor %}
-            </ul>
-          </li>
-        </li> -->
         <li class="nav-item">
           <a class="nav-link" href="{% url 'saller-logout' %}">Log out</a>
         </li>
@@ -57,15 +46,39 @@
                 <p class="text-muted mb-4">{{product.product_discription}}</p>
               </div>
               <div>
-                <!-- ś -->
               <div class="d-flex justify-content-between total font-weight-bold mt-4">
                 <span>Total</span><span>₹{{product.product_price}}</span><br>
                 <p>Add By :</p><p class="text-muted mb-4">{{product.user}}</p>
                 <p>Quantity :</p><p class="text-muted mb-4">{{product.quantity}}</p>
-              </div>
+              </div><br>
+              <h3 class="card-title">Product reviews:</h3><br>
+              {% for comment in comments %}
+              <h6>Comment By : {{comment.user}}</h6>
+              <p class="text-muted m-3">{{comment.comments}}</p>
+              {% endfor %}
             </div>
           </div>
-        </div>
+        </div><br>
+        {% if product.id in ordered %}
+        <h4>Rate this product :</h4><br>
+        <form action="" method="POST">
+          {% csrf_token %}
+          <input class="form-check-input" type="radio" name="rate" id="flexRadioDefault1" value="1">
+          <label class="form-check-label">1</label>
+          <input class="form-check-input" type="radio" name="rate" id="flexRadioDefault2" value="2">
+          <label class="form-check-label">2</label>
+          <input class="form-check-input" type="radio" name="rate" id="flexRadioDefault2" value="3">
+          <label class="form-check-label">3</label>
+          <input class="form-check-input" type="radio" name="rate" id="flexRadioDefault2" value="4">
+          <label class="form-check-label">4</label>
+          <input class="form-check-input" type="radio" name="rate" id="flexRadioDefault2" value="5">
+          <label class="form-check-label">5</label><br>
+          <hr>
+          <label for="">Discribe your review:</label><br><br>
+          <textarea name="comments" id="" cols="174" rows="10"></textarea><br><br>
+          <input type="submit" class="btn btn-success" value="Submit">
+        </form>
+        {% endif %}
       </div>
     </div>
   </section>

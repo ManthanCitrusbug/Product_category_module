@@ -1,3 +1,6 @@
+from ast import mod
+from audioop import ratecv
+from enum import unique
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
@@ -83,8 +86,26 @@ class Product(models.Model):
 class WishList(models.Model):
     user                           = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     products                       = models.ForeignKey(Product, on_delete=models.CASCADE)
-    
+    quantity                       = models.PositiveIntegerField(default=1)
 
+    
 class Cart(models.Model):
     user                           = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     products                       = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity                       = models.PositiveIntegerField(default=1)
+
+
+class OrderedProducts(models.Model):
+    user                           = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+    products                       = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity                       = models.PositiveIntegerField(default=1)
+
+
+class Comments(models.Model):
+    user                           = models.ForeignKey(UserModel, on_delete=models.CASCADE,)
+    products                       = models.ForeignKey(Product, on_delete=models.CASCADE)
+    comments                       = models.TextField(blank=True, null=True)
+    rate                           = models.DecimalField(max_digits=2, decimal_places=1, default=1)
+
+    class Meta:
+        unique_together = (("user", "products"))

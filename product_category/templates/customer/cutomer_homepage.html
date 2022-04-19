@@ -40,6 +40,7 @@
 </nav>
 {% endblock navbar %}
 {% block content %}
+
 <div class="jumbotron m-5">
   <h1 class="display-4">Welcome {{request.user}}</h1>
   <p class="lead">Here are products...</p>
@@ -58,24 +59,28 @@
       <p>Quantity : {{product.quantity}}</p>
       <p>{{product.user}}</p>
       <a class="btn btn-primary btn-lg" href="{% url 'details' product.id %}" role="button">Details</a>
-      {% if product.id in cart %}
-        <a class="btn btn-warning btn-lg" href="{% url 'cart' %}">Go to Cart</a>
-        {% else %}
-      <form action="{% url 'add-to-cart' product.id %}" method="POST" class="d-inline mx-1">
-        {% csrf_token %}
-        <button class="btn btn-warning btn-lg">Add to Cart</button>
-        {% endif %}
-      </form>
-      {% if product.id in wishlist %}
-      <a class="btn btn-info btn-lg" href="{% url 'wish-list' %}">Go to Wishlist</a>
+      {% if product.id in ordered %}
+        <a aria-disabled="true" class="btn btn-secondary btn-lg">Ordered Placed</a>
       {% else %}
-      <form action="{% url 'add-to-wish-list' product.id %}" method="POST" class="d-inline mx-1">
-        {% csrf_token %}
-        <button class="btn btn-info btn-lg">Add to wish list</button>
-      </form>
+        {% if product.id in cart %}
+          <a class="btn btn-warning btn-lg" href="{% url 'cart' %}">Go to Cart</a>
+          {% else %}
+        <form action="{% url 'add-to-cart' product.id %}" method="POST" class="d-inline mx-1">
+          {% csrf_token %}
+          <button class="btn btn-warning btn-lg">Add to Cart</button>
+          {% endif %}
+        </form>
+        {% if product.id in wishlist %}
+        <a class="btn btn-info btn-lg" href="{% url 'wish-list' %}">Go to Wishlist</a>
+        {% else %}
+        <form action="{% url 'add-to-wish-list' product.id %}" method="POST" class="d-inline mx-1">
+          {% csrf_token %}
+          <button class="btn btn-info btn-lg">Add to wish list</button>
+        </form>
+        {% endif %}
       {% endif %}
     </div>  
-    {% endfor %}
+    {% endfor %}  
 {% endblock content %}
 <div class="paginater-hide">
 {% block paginator %}

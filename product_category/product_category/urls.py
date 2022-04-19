@@ -46,7 +46,8 @@ urlpatterns = [
     path('details/<int:pk>',views.ProductDetailsView.as_view(),name='details'),
     path('search', views.SearchView.as_view(), name='search'),
     path('filter', views.CategoryView.as_view(), name='filter'),
-    path('plus-quantity', views.PlusCartView.as_view(), name='quantity'),
-
+    path('plus-quantity', views.PlusCartView.as_view(), name='plus-quantity'),
+    path('minus-quantity', views.MinusCartView.as_view(), name='minus-quantity'),
+    path('buy-product/<int:id>', views.BuyProductView.as_view(), name='buy-product'),
 
 ] + static(settings.MEDIA_URL , document_root = settings.MEDIA_ROOT)
