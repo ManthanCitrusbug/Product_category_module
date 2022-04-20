@@ -48,7 +48,6 @@
 </div>
 <div class="main"></div>
     {% for wish_list in wish_list %}
-    {{wish_list.products.id}}
     <div class="jumbotron m-5 mt-5 hide">
       <img src="{{wish_list.products.product_image.url}}" class="image_container" alt="" width="250px" height="250px"> 
       <h1 class="display-4" id="product_name">{{wish_list.products.product_name}}</h1> 
@@ -58,15 +57,21 @@
       <p>{{wish_list.products.product_category}}</p>
       <p>Quantity : {{wish_list.products.quantity}}</p>
       <p>{{wish_list.user}}</p>
-      <a class="btn btn-primary btn-lg" href="{% url 'details' wish_list.products.id %}" role="button">Details</a>  
-      <form action="{% url 'add-to-cart' wish_list.products.id %}" method="POST" class="d-inline mx-1">
-        {% csrf_token %}
-        <button class="btn btn-warning btn-lg">Add to cart</button>
-      </form>
-      <form action="{% url 'remove-from-wish-list' wish_list.id %}" method="POST" class="d-inline mx-1">
-        {% csrf_token %}
-        <button class="btn btn-info btn-lg">Remove from wish list</button>
-      </form>
+      <a class="btn btn-primary btn-lg" href="{% url 'details' wish_list.products.id %}" role="button">Details</a>
+      {% if wish_list.id not in prod_qun %}
+          {% if wish_list.products.id not in cart %}
+          <form action="{% url 'add-to-cart' wish_list.products.id %}" method="POST" class="d-inline mx-1">
+            {% csrf_token %}
+            <button class="btn btn-warning btn-lg">Add to cart</button>
+          </form>
+          {% else %}
+            <a class="btn btn-warning btn-lg" href="{% url 'cart' %}">Go to Cart</a>
+          {% endif %}
+        {% endif %}
+        <form action="{% url 'remove-from-wish-list' wish_list.id %}" method="POST" class="d-inline mx-1">
+          {% csrf_token %}
+          <button class="btn btn-info btn-lg">Remove from wish list</button>
+        </form>  
     </div>
     {% endfor %}
 {% endblock content %}

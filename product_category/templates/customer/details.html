@@ -53,31 +53,41 @@
               </div><br>
               <h3 class="card-title">Product reviews:</h3><br>
               {% for comment in comments %}
-              <h6>Comment By : {{comment.user}}</h6>
-              <p class="text-muted m-3">{{comment.comments}}</p>
+                {% if comment.user == request.user %}
+                <h6>Comment By : {{comment.user}} <a href="{% url 'delete-comment' comment.id %}" class="text-danger">Delete</a></h6>
+                {% else %}
+                <h6>Comment By : {{comment.user}}</h6>
+                {% endif %}
+                <p class="text-muted m-3">{{comment.comments}}</p>
               {% endfor %}
+              <h4>Average Product Rate : {{avg_rate.avg_rate|floatformat:2}}</h4><br>
             </div>
           </div>
         </div><br>
+        
         {% if product.id in ordered %}
-        <h4>Rate this product :</h4><br>
-        <form action="" method="POST">
-          {% csrf_token %}
-          <input class="form-check-input" type="radio" name="rate" id="flexRadioDefault1" value="1">
-          <label class="form-check-label">1</label>
-          <input class="form-check-input" type="radio" name="rate" id="flexRadioDefault2" value="2">
-          <label class="form-check-label">2</label>
-          <input class="form-check-input" type="radio" name="rate" id="flexRadioDefault2" value="3">
-          <label class="form-check-label">3</label>
-          <input class="form-check-input" type="radio" name="rate" id="flexRadioDefault2" value="4">
-          <label class="form-check-label">4</label>
-          <input class="form-check-input" type="radio" name="rate" id="flexRadioDefault2" value="5">
-          <label class="form-check-label">5</label><br>
-          <hr>
-          <label for="">Discribe your review:</label><br><br>
-          <textarea name="comments" id="" cols="174" rows="10"></textarea><br><br>
-          <input type="submit" class="btn btn-success" value="Submit">
-        </form>
+        <h4>Rate this product :</h4><br>   
+          <form action="" method="POST">
+            {% csrf_token %}
+            {% if user.id not in rating %}
+            <input class="form-check-input" type="radio" name="rate" id="flexRadioDefault1" value="1">
+            <label class="form-check-label">1</label>
+            <input class="form-check-input" type="radio" name="rate" id="flexRadioDefault2" value="2">
+            <label class="form-check-label">2</label>
+            <input class="form-check-input" type="radio" name="rate" id="flexRadioDefault2" value="3">
+            <label class="form-check-label">3</label>
+            <input class="form-check-input" type="radio" name="rate" id="flexRadioDefault2" value="4">
+            <label class="form-check-label">4</label>
+            <input class="form-check-input" type="radio" name="rate" id="flexRadioDefault2" value="5">
+            <label class="form-check-label">5</label><br>
+            {% else %}
+            <h4>Alredy Rated...</h4>
+            {% endif %}
+            <hr>
+            <label for="">Discribe your review:</label><br><br>
+            <textarea name="comments" id="" cols="173" rows="10"></textarea><br><br>
+            <input type="submit" class="btn btn-success" value="Submit">
+          </form>
         {% endif %}
       </div>
     </div>

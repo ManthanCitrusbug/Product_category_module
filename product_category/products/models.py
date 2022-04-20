@@ -105,7 +105,4 @@ class Comments(models.Model):
     user                           = models.ForeignKey(UserModel, on_delete=models.CASCADE,)
     products                       = models.ForeignKey(Product, on_delete=models.CASCADE)
     comments                       = models.TextField(blank=True, null=True)
-    rate                           = models.DecimalField(max_digits=2, decimal_places=1, default=1)
-
-    class Meta:
-        unique_together = (("user", "products"))
+    rate                           = models.DecimalField(max_digits=2, decimal_places=1, blank=True, null=True)

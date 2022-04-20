@@ -49,5 +49,6 @@ urlpatterns = [
     path('plus-quantity', views.PlusCartView.as_view(), name='plus-quantity'),
     path('minus-quantity', views.MinusCartView.as_view(), name='minus-quantity'),
     path('buy-product/<int:id>', views.BuyProductView.as_view(), name='buy-product'),
+    path('delete-comment/<int:pk>', views.DeleteCommentView.as_view(), name='delete-comment'),
 
 ] + static(settings.MEDIA_URL , document_root = settings.MEDIA_ROOT)

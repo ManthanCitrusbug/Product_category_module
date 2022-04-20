@@ -1,13 +1,11 @@
 from asyncio.windows_events import NULL
-from importlib.resources import contents
-from itertools import product
-from multiprocessing import context
-from unittest import result
-from urllib import request
+from inspect import _empty
+from pickle import NONE
+from queue import Empty
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.db.models import Q
-from django.db.models import Sum
+from django.db.models import Sum, Avg
 from django.views import View
 from django.http import JsonResponse
 from django.db.models.functions import Concat
@@ -22,7 +20,7 @@ from .forms import (SallerRegisterForm,
                     CustomerRegisterForm, 
                     AddProductForm, 
                     EditProductForm)
-from django.views.generic import CreateView, TemplateView, ListView, UpdateView, DetailView, View
+from django.views.generic import CreateView, TemplateView, ListView, UpdateView, DetailView, View, DeleteView
 from django.contrib.auth import authenticate, login, logout
 
 
@@ -229,6 +227,7 @@ class CustomerHomePageView(ListView):
         context['cart'] = Cart.objects.filter(user=self.request.user).values_list("products__id", flat=True)
         context['wishlist'] = WishList.objects.filter(user=self.request.user).values_list("products__id", flat=True)
         context['ordered'] = OrderedProducts.objects.filter(user=self.request.user).values_list('products__id', flat=True)
+        context['prod_qun'] = Product.objects.filter(quantity=0).values_list('id', flat=True)
         return context
 
 
@@ -258,7 +257,7 @@ class SearchView(View):
 
 
 class WishListView(ListView):
-    model = Product
+    model = WishList
     template_name = 'customer/wish_list.html'
     context_object_name = 'wish_list'
     ordering = ['id']
@@ -268,6 +267,8 @@ class WishListView(ListView):
         context = super().get_context_data(**kwargs)
         context['category'] = Category.objects.all()
         context['wish_list'] = WishList.objects.filter(user=self.request.user)
+        context['cart'] = Cart.objects.filter(user=self.request.user).values_list("products__id", flat=True)
+        context['prod_qun'] = WishList.objects.filter(products__quantity=0).values_list('id', flat=True)
         return context
 
 
@@ -295,22 +296,26 @@ class ProductDetailsView(DetailView):
         pk = self.kwargs.get('pk')
         context = super().get_context_data(**kwargs)
         context['ordered'] = OrderedProducts.objects.filter(user=self.request.user).values_list('products__id', flat=True)
-        context['comments'] = Comments.objects.filter(products__id=pk)
+        context['comments'] = Comments.objects.filter(Q(products__id=pk) & ~Q(comments=""))
+        context['avg_rate'] = Comments.objects.filter(products__id=pk).aggregate(avg_rate=Avg('rate'))
+        context['rating'] = Comments.objects.filter(products__id=pk).exclude(rate=None).values_list('user__id', flat=True)
+
         return context
         
     def post(self, request, pk):
         com = self.request.POST['comments']
-        rate = self.request.POST['rate']
-        print(rate)
+        rate = self.request.POST.get('rate',None)
         prod = Product.objects.get(id=pk)
-        Comments(user=self.request.user, products=prod, comments=com).save()
+        if rate!=None or com!="":
+            Comments(user=self.request.user, products=prod, comments=com, rate=rate).save()
         return redirect('customer-homepage')
 
 
 class AddtoWishListView(View):
     def post(self, request, id):
         product = Product.objects.get(id=id)
-        WishList(user=request.user,products=product).save()
+        if not WishList.objects.filter(user=request.user,products=product).exists():
+            WishList(user=request.user,products=product).save()
         return redirect('wish-list')
 
 
@@ -323,7 +328,8 @@ class RemovefromWishListView(View):
 class AddtoCartView(View):
     def post(self, request, id):
         product = Product.objects.get(id=id)
-        Cart(user=request.user, products=product).save()
+        if not Cart.objects.filter(user=request.user,products=product).exists():
+            Cart(user=request.user, products=product).save()
         WishList.objects.filter(products__id=id, user=request.user).delete()
         return redirect('cart')
 
@@ -362,22 +368,16 @@ class CategoryView(View):
 class PlusCartView(View):
     def get(self, request):
         prod_id = request.GET.get('id')
-        print('id',prod_id)
         prod_qun = request.GET.get('quantity')
-        print('qun',prod_qun)
-        cart_qun = Cart.objects.filter(id=prod_id).update(quantity=prod_qun)
-        print(cart_qun)
+        Cart.objects.filter(id=prod_id).update(quantity=prod_qun)
         return redirect('customer-homepage')
 
     
 class MinusCartView(View):
     def get(self, request):
         prod_id = request.GET.get('id')
-        print('id',prod_id)
         prod_qun = request.GET.get('quantity')
-        print('qun',prod_qun)
-        cart_qun = Cart.objects.filter(id=prod_id).update(quantity=prod_qun)
-        print(cart_qun)
+        Cart.objects.filter(id=prod_id).update(quantity=prod_qun)
         return redirect('customer-homepage')
 
 
@@ -390,4 +390,10 @@ class BuyProductView(View):
         Product.objects.filter(id=id).update(quantity=qun)
         OrderedProducts(products=prod, user=request.user, quantity=cart.quantity).save()
         Cart.objects.filter(products__id=id).delete()
+        return redirect('customer-homepage')
+
+
+class DeleteCommentView(View):
+    def get(self, request, pk):
+        Comments.objects.filter(id=pk).update(comments="")
         return redirect('customer-homepage')
