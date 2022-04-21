@@ -11,8 +11,6 @@ from django.http import JsonResponse
 from django.db.models.functions import Concat
 from django.db.models import Value
 
-import products
-
 from .models import Category, Product, UserModel, WishList, Cart, OrderedProducts, Comments
 from .forms import (SallerRegisterForm, 
                     SallerLoginForm, 
@@ -64,8 +62,8 @@ class SallerLoginView(View):
         email = request.POST['email']
         password = request.POST['password']
         user = authenticate(email=email,password=password)
-        if UserModel.objects.filter(username = user.username, is_seller = True).exists():
-            if user is not None:
+        if user is not None:
+            if UserModel.objects.filter(username = user.username, is_seller = True).exists():
                 login(request, user)
                 return redirect('saller-dashboard')
         else:
@@ -80,7 +78,7 @@ class SallerLoginView(View):
 class SallerLogoutView(View):
     def get(self,request):
         logout(request)
-        return redirect('/')
+        return redirect('index')
 
 
 class SallerDashboardView(ListView):
@@ -129,14 +127,12 @@ class SellerCategoryView(View):
                 'quantity':p.quantity,
             }       
             data.append(items)
-        print(data)
         return JsonResponse({'data':data})
 
     
 class SellerSearchView(View):
     def get(self, request):
         search = request.GET.get('search')
-        print(search)
         qs = Product.objects.filter(product_name__icontains=search, user=request.user)
         data = None
         if len(search)>0 and len(qs)>0:
@@ -234,7 +230,6 @@ class CustomerHomePageView(ListView):
 class SearchView(View):
     def get(self, request):
         search = request.GET.get('search')
-        print(search)
         qs = Product.objects.filter(product_name__icontains=search)
         data = None
         if len(search)>0 and len(qs)>0:
@@ -299,7 +294,6 @@ class ProductDetailsView(DetailView):
         context['comments'] = Comments.objects.filter(Q(products__id=pk) & ~Q(comments=""))
         context['avg_rate'] = Comments.objects.filter(products__id=pk).aggregate(avg_rate=Avg('rate'))
         context['rating'] = Comments.objects.filter(products__id=pk).exclude(rate=None).values_list('user__id', flat=True)
-
         return context
         
     def post(self, request, pk):
@@ -308,14 +302,14 @@ class ProductDetailsView(DetailView):
         prod = Product.objects.get(id=pk)
         if rate!=None or com!="":
             Comments(user=self.request.user, products=prod, comments=com, rate=rate).save()
-        return redirect('customer-homepage')
+        return redirect('details', pk)
 
 
 class AddtoWishListView(View):
     def post(self, request, id):
         product = Product.objects.get(id=id)
         if not WishList.objects.filter(user=request.user,products=product).exists():
-            WishList(user=request.user,products=product).save()
+            WishList(user=request.user,products=product, quantity=product.quantity).save()
         return redirect('wish-list')
 
 
@@ -385,7 +379,6 @@ class BuyProductView(View):
     def post(self, request, id):
         cart = Cart.objects.get(products__id=id, user=request.user)
         prod = Product.objects.get(id=id)
-        print(prod)
         qun = prod.quantity - cart.quantity
         Product.objects.filter(id=id).update(quantity=qun)
         OrderedProducts(products=prod, user=request.user, quantity=cart.quantity).save()
@@ -395,5 +388,6 @@ class BuyProductView(View):
 
 class DeleteCommentView(View):
     def get(self, request, pk):
+        prod_id = Product.objects.get(comments__id=pk)
         Comments.objects.filter(id=pk).update(comments="")
-        return redirect('customer-homepage')
+        return redirect('details', prod_id.id)

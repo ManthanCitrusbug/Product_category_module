@@ -34,8 +34,9 @@
         <span id="error_password" class="text-danger"></span><br><br>
         <label for="">Confirm Password :</label><br>
         {{form.confirm_password}}
-        <span id="error_c_password" class="text-danger"></span><br><br>
-        <input type="submit" value="Submit" class="btn btn-success">
+        <span id="error_c_password" class="text-danger"></span><br>
+        <input type="submit" value="Submit" class="btn btn-success"><br><br>
+        Try to login if already registered <a href="{% url 'customer-login' %}" class="text-muted">Log in</a> or to <a href="{% url 'index' %}" class="text-muted">homepage</a><br><br>
     </form>
     {% endblock content %}
     {% block paginator %}

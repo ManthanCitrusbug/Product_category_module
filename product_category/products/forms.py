@@ -149,7 +149,7 @@ class AddProductForm(forms.ModelForm):
 class EditProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['product_name', 'product_discription', 'product_image', 'product_price', 'product_category']
+        fields = ['product_name', 'product_discription', 'product_image', 'product_price', 'product_category', 'quantity']
         widgets = {
             'product_name' : forms.TextInput(
                 attrs={'class' : 'form-control w-50 m-auto'}
@@ -164,6 +164,9 @@ class EditProductForm(forms.ModelForm):
                 attrs={'class' : 'form-control w-50 m-auto'}
             ),
             'product_price' : forms.TextInput(
+                attrs={'class' : 'form-control w-50 m-auto'}
+            ),
+            'quantity' : forms.TextInput(
                 attrs={'class' : 'form-control w-50 m-auto'}
             ),
         }

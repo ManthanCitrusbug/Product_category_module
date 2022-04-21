@@ -22,6 +22,7 @@
         {{form.password}}
         <span id="error_password" class="text-danger"></span><br><br>
         <input type="submit" value="Submit" class="btn btn-success"><br><br>
+        For register <a href="{% url 'saller-register' %}" class="text-muted">Register</a> or to <a href="{% url 'index' %}" class="text-muted">homepage</a><br><br>
         <h3 class="text-danger">{{msg}}</h3>
     </form>
     {% endblock content %}

@@ -3,6 +3,8 @@ from audioop import ratecv
 from enum import unique
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.dispatch import receiver
 
 
 class UserManager(BaseUserManager):
@@ -60,6 +62,16 @@ class UserModel(AbstractBaseUser,PermissionsMixin):
         return self.username
 
 
+# @receiver(user_logged_in, sender=UserModel)
+# def login_done(sender, request, user, **kwargs):
+#     print(user,"Login...")
+
+
+# @receiver(user_logged_out, sender=UserModel)
+# def login_done(sender, request, user, **kwargs):
+#     print(user,"Logout...")
+
+
 class Category(models.Model):
     category_name                  = models.CharField(max_length=70)
 
@@ -86,7 +98,7 @@ class Product(models.Model):
 class WishList(models.Model):
     user                           = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     products                       = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity                       = models.PositiveIntegerField(default=1)
+    quantity                       = models.PositiveIntegerField()
 
     
 class Cart(models.Model):

@@ -21,7 +21,7 @@ from products import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',views.IndexView.as_view(),name='index'),
+    path('index',views.IndexView.as_view(),name='index'),
 #---------------------------------------------------------------------------------------------------------------------------
     path('saller-register',views.SallerRegisterView.as_view(), name='saller-register'),
     path('saller-login', views.SallerLoginView.as_view(), name='saller-login'),

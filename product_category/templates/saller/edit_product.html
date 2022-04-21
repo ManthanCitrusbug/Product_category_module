@@ -64,9 +64,9 @@
             <span id="error_product_price" class="text-danger"></span><br>
             <label for="">Product Category :</label><br>
             {{form.product_category}}
-            <!-- <label for="">Product Quantity :</label><br> -->
-            {{form.quantity}}
-            <span id="error_product_category" class="text-danger"></span><br><br>
+            <span id="error_product_category" class="text-danger"></span><br>
+            <label for="">Product Quantity :</label><br>
+            {{form.quantity}}<br><br>
             <input type="submit" value="Submit" class="btn btn-success">
         </form>
     {% endblock content %}
